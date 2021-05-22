@@ -1,6 +1,7 @@
 package ru.sunoplyaandesin.simplemessenger.dto;
 
 import lombok.Data;
+import org.springframework.util.CollectionUtils;
 import ru.sunoplyaandesin.simplemessenger.domain.Room;
 import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.domain.roles.SystemRoles;
@@ -43,10 +44,12 @@ public class UserDTO {
         user.setPassword(this.password);
         user.setSystemRole(this.systemRole);
 
-        Set<Room> rooms = this.roomsDTO.stream()
-                .map(RoomDTO::toRoom)
-                .collect(Collectors.toSet());
-        user.setRooms(rooms);
+        if (!CollectionUtils.isEmpty(user.getRooms())) {
+            Set<Room> rooms = this.roomsDTO.stream()
+                    .map(RoomDTO::toRoom)
+                    .collect(Collectors.toSet());
+            user.setRooms(rooms);
+        }
         return user;
     }
 }
