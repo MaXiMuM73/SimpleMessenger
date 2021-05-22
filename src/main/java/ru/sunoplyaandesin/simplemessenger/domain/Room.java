@@ -46,7 +46,7 @@ public class Room {
      * Room owner
      */
     @OneToOne(fetch = FetchType.EAGER)
-    @MapsId
+    //@MapsId
     @JoinColumn(name = "user_id")
     private User user;
 
