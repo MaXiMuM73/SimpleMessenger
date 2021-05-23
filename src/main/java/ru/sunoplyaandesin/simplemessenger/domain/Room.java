@@ -3,12 +3,7 @@ package ru.sunoplyaandesin.simplemessenger.domain;
 import lombok.Data;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Data
@@ -19,6 +14,7 @@ public class Room {
      * Unique identifier
      */
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private long id;
 
@@ -26,28 +22,26 @@ public class Room {
      * Date of creation
      */
     @Column(name = "created_date", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
 
     /**
      * Room title
      */
-    @NotBlank
     @Column(name = "title", nullable = false)
     private String title;
 
     /**
      * Privacy Flag
      */
-    @NotBlank
     @Column(name = "private", nullable = false)
     private boolean privateRoom;
 
     /**
      * Room owner
      */
-    @OneToOne(fetch = FetchType.EAGER)
-    //@MapsId
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
     /**

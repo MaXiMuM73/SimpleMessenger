@@ -4,7 +4,6 @@ import lombok.Data;
 import ru.sunoplyaandesin.simplemessenger.domain.roles.SystemRoles;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,21 +23,18 @@ public class User {
     /**
      * User name
      */
-    @NotBlank
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     /**
      * User password
      */
-    @NotBlank
     @Column(name = "password")
     private String password;
 
     /**
      * User system role
      */
-    @NotBlank
     @Column(name = "system_role", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private SystemRoles systemRole;

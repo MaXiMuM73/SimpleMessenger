@@ -1,5 +1,6 @@
 package ru.sunoplyaandesin.simplemessenger.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.util.CollectionUtils;
 import ru.sunoplyaandesin.simplemessenger.domain.Room;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 @Data
 public class UserDTO {
 
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private long id;
 
     private String name;
@@ -20,6 +22,7 @@ public class UserDTO {
 
     private SystemRoles systemRole;
 
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private Set<RoomDTO> roomsDTO;
 
     public static UserDTO from(User user) {

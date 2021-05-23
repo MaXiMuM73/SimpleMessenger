@@ -1,6 +1,5 @@
 package ru.sunoplyaandesin.simplemessenger.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.repository.UserRepository;
@@ -9,8 +8,11 @@ import ru.sunoplyaandesin.simplemessenger.repository.UserRepository;
 @Service
 public class UserServiceImpl implements UserService{
 
-    @Autowired
     UserRepository userRepository;
+
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public boolean createUser(User user) {
@@ -21,4 +23,9 @@ public class UserServiceImpl implements UserService{
             return false;
         }
     }
+
+//    @Override
+//    public User findByName(String name) {
+//        return userRepository.finByName(name);
+//    }
 }
