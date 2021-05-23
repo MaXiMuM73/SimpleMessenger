@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 import ru.sunoplyaandesin.simplemessenger.domain.Room;
 import ru.sunoplyaandesin.simplemessenger.repository.RoomRepository;
 
+import java.util.Optional;
+
 @Service
 public class RoomServiceImpl implements RoomService {
 
@@ -31,5 +33,21 @@ public class RoomServiceImpl implements RoomService {
         } catch (RuntimeException runtimeException) {
             return false;
         }
+    }
+
+    @Override
+    public Optional<Room> findByTitle(String title) {
+        return roomRepository.findByTitle(title);
+    }
+
+    @Override
+    public boolean renameRoom(String title, String newTitle) {
+        if (roomRepository.findByTitle(title).isPresent()) {
+            Room room = roomRepository.findByTitle(title).get();
+            room.setTitle(newTitle);
+            roomRepository.save(room);
+            return true;
+        }
+        return false;
     }
 }

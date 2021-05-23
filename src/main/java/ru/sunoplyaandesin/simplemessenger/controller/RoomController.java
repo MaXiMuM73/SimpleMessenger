@@ -61,4 +61,24 @@ public class RoomController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @Operation(
+            summary = "Renaming rooms",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request")
+            },
+            description = "Allows you to rename a room"
+    )
+    @PostMapping("/rename")
+    public ResponseEntity rename(
+            @RequestParam(value = "title")
+            @Parameter(description = "room title", required = true) String title,
+            @Parameter(description = "New title", required = true) String newTitle) {
+        if (roomService.renameRoom(title, newTitle)) {
+            return ResponseEntity.ok("Room " + title + " renamed.");
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
