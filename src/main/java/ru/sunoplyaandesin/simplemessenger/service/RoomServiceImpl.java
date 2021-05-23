@@ -22,4 +22,14 @@ public class RoomServiceImpl implements RoomService {
             return false;
         }
     }
+
+    @Override
+    public boolean deleteByTitle(String title) {
+        try {
+            roomRepository.deleteByTitle(title);
+            return true;
+        } catch (RuntimeException runtimeException) {
+            return false;
+        }
+    }
 }
