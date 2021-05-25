@@ -23,5 +23,7 @@
 .idea/**
 target/**
 
-# Files 
+# Files
+README.md
 SimpleMessanger.iml
+src/main/resources/application.properties
