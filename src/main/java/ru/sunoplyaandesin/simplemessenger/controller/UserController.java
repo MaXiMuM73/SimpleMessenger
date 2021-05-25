@@ -28,7 +28,8 @@ public class UserController {
                     @ApiResponse(responseCode = "200", description = "Success"),
                     @ApiResponse(responseCode = "400", description = "Bad request")
             },
-            description = "Allows you to register a user")
+            description = "Allows you to register a user"
+    )
     @PostMapping("/register")
     public ResponseEntity registerUser(
             @RequestBody @Parameter(description = "UserDTO", required = true) UserDTO userDTO) {
