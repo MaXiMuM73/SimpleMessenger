@@ -5,15 +5,18 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.dto.UserDTO;
 import ru.sunoplyaandesin.simplemessenger.service.UserService;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
 @Tag(name = "User controller", description = "User controller description")
+@RequestMapping("/users")
 public class UserController {
 
     private UserService userService;
@@ -37,5 +40,21 @@ public class UserController {
         } else {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @Operation(
+            summary = "All users in app",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request")
+            },
+            description = "Allows you to get all users")
+    @GetMapping
+    public ResponseEntity getAllUsers() {
+        List<User> allUsers = userService.getAllUsers();
+        List<UserDTO> allUsersDTO = allUsers.stream()
+                .map(UserDTO::from)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(allUsersDTO);
     }
 }
