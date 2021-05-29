@@ -2,13 +2,9 @@ package ru.sunoplyaandesin.simplemessenger.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import org.springframework.util.CollectionUtils;
-import ru.sunoplyaandesin.simplemessenger.domain.Room;
 import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.domain.roles.SystemRoles;
 
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Data
 public class UserDTO {
@@ -22,21 +18,12 @@ public class UserDTO {
 
     private SystemRoles systemRole;
 
-    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
-    private Set<RoomDTO> roomsDTO;
-
     public static UserDTO from(User user) {
         UserDTO userDTO = new UserDTO();
         userDTO.setId(user.getId());
         userDTO.setName(user.getName());
         userDTO.setPassword(user.getPassword());
         userDTO.setSystemRole(user.getSystemRole());
-
-        Set<RoomDTO> roomsDTO = user.getRooms().stream()
-                .map(RoomDTO::from)
-                .collect(Collectors.toSet());
-        userDTO.setRoomsDTO(roomsDTO);
-
         return userDTO;
     }
 
@@ -46,13 +33,6 @@ public class UserDTO {
         user.setName(this.name);
         user.setPassword(this.password);
         user.setSystemRole(this.systemRole);
-
-        if (!CollectionUtils.isEmpty(user.getRooms())) {
-            Set<Room> rooms = this.roomsDTO.stream()
-                    .map(RoomDTO::toRoom)
-                    .collect(Collectors.toSet());
-            user.setRooms(rooms);
-        }
         return user;
     }
 }

@@ -43,26 +43,4 @@ public class Room {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
-
-    /**
-     * Room users
-     */
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "users_in_room",
-            joinColumns = {@JoinColumn(name = "room_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id"),}
-    )
-    private Set<User> users = new HashSet<>();
-
-    /**
-     * Room user role
-     */
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "users_in_room",
-            joinColumns = {@JoinColumn(name = "room_id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id")}
-    )
-    private List<RoomRole> roomRoles = new ArrayList<>();
 }

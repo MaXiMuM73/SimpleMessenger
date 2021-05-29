@@ -8,6 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface RoomRepository extends CrudRepository<Room, Long> {
+
     void deleteByTitle(String title);
 
     Optional<Room> findByTitle(String title);
