@@ -3,7 +3,8 @@ package ru.sunoplyaandesin.simplemessenger.dto;
 import lombok.Data;
 import ru.sunoplyaandesin.simplemessenger.domain.Message;
 
-import java.sql.Date;
+import java.util.Date;
+
 
 @Data
 public class MessageDTO {
@@ -14,26 +15,25 @@ public class MessageDTO {
 
     private String text;
 
-    private UserDTO userDTO;
+    private long userId;
 
-    private RoomDTO roomDTO;
+    private long roomId;
 
     public static MessageDTO from(Message message) {
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setId(message.getId());
         messageDTO.setCreatedDate(message.getCreatedDate());
         messageDTO.setText(message.getText());
-        messageDTO.setUserDTO(UserDTO.from(message.getUser()));
-        messageDTO.setRoomDTO(RoomDTO.from(message.getRoom()));
+        messageDTO.setUserId(message.getUser().getId());
+        messageDTO.setRoomId(message.getRoom().getId());
         return messageDTO;
     }
 
     public Message toMessage() {
-        Message message = new Message();
-        message.setId(this.id);
-        message.setCreatedDate(this.createdDate);
-        message.setText(this.text);
-        message.setUser(this.userDTO.toUser());
-        return message;
+        return Message.builder()
+                .id(this.id)
+                .createdDate(this.createdDate)
+                .text(this.text)
+                .build();
     }
 }
