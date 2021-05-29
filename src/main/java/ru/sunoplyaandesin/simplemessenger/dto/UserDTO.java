@@ -16,6 +16,7 @@ public class UserDTO {
 
     private String password;
 
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private SystemRoles systemRole;
 
     public static UserDTO from(User user) {

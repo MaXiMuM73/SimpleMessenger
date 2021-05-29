@@ -80,11 +80,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String authorize(User user) {
-        User foundUser = userRepository.findByName(user.getName()).get();
+        User foundUser = userRepository.findByName(user.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(user.getName()));
+
         if (!passwordEncoder.matches(user.getPassword(), foundUser.getPassword())) {
             throw new WrongPasswordException();
         }
-        String token = jwtProvider.generateToken(user.getName());
-        return token;
+
+        return jwtProvider.generateToken(user.getName());
     }
 }

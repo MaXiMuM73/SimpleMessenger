@@ -61,8 +61,8 @@ public class UserController {
     }
 
     @PostMapping("/auth")
-    public String auth(@RequestBody UserDTO userDTO) {
-        return userService.authorize(userDTO.toUser());
+    public ResponseEntity<String> auth(@RequestBody UserDTO userDTO) {
+        return ResponseEntity.ok(userService.authorize(userDTO.toUser()));
     }
 
     @Operation(
