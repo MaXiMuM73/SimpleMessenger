@@ -22,7 +22,7 @@ public class UserDTO {
         UserDTO userDTO = new UserDTO();
         userDTO.setId(user.getId());
         userDTO.setName(user.getName());
-        userDTO.setPassword(user.getPassword());
+        userDTO.setPassword("password");
         userDTO.setSystemRole(user.getSystemRole());
         return userDTO;
     }
