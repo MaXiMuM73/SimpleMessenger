@@ -41,6 +41,7 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public boolean deleteByTitle(String title) {
         try {
+            Room room = roomRepository.findByTitle(title).get();
             roomRepository.deleteByTitle(title);
             return true;
         } catch (RuntimeException runtimeException) {

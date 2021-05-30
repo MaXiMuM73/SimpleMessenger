@@ -29,6 +29,7 @@ public class RoomRole {
      * User room
      */
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "room_id")
     private Room room;
 
     /**

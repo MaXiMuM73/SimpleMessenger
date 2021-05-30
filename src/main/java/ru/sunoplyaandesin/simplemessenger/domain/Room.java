@@ -43,4 +43,21 @@ public class Room {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER,  cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoomRole> roomRoles;
+
+    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> messages;
+
+    @Override
+    public String toString() {
+        return "Room{" +
+                "id=" + id +
+                ", createdDate=" + createdDate +
+                ", title='" + title + '\'' +
+                ", privateRoom=" + privateRoom +
+                ", user=" + user +
+                '}';
+    }
 }
