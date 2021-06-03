@@ -1,23 +1,23 @@
 package ru.sunoplyaandesin.simplemessenger.service;
 
-import org.springframework.lang.NonNull;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import ru.sunoplyaandesin.simplemessenger.domain.User;
 
 import java.util.List;
-import java.util.Optional;
+
 
 public interface UserService {
 
-    boolean create(User user);
+    User create(User user);
 
-    boolean update(User user);
-
-    boolean delete(String name);
+    User find(long id);
 
     User findByName(String name);
 
-    List<User> getAllUsers();
+    void update(User user);
+
+    void delete(String name);
+
+    List<User> findAll();
 
     User findByNameAndPassword(String name, String password);
 

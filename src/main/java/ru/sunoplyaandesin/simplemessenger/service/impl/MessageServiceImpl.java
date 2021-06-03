@@ -1,12 +1,15 @@
 package ru.sunoplyaandesin.simplemessenger.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.sunoplyaandesin.simplemessenger.domain.Message;
 import ru.sunoplyaandesin.simplemessenger.domain.Room;
 import ru.sunoplyaandesin.simplemessenger.domain.User;
+import ru.sunoplyaandesin.simplemessenger.exception.MessageNotFoundException;
+import ru.sunoplyaandesin.simplemessenger.exception.RoomNotFoundException;
+import ru.sunoplyaandesin.simplemessenger.exception.UserNotFoundException;
 import ru.sunoplyaandesin.simplemessenger.repository.MessageRepository;
 import ru.sunoplyaandesin.simplemessenger.repository.RoomRepository;
-import ru.sunoplyaandesin.simplemessenger.repository.RoomRoleRepository;
 import ru.sunoplyaandesin.simplemessenger.repository.UserRepository;
 import ru.sunoplyaandesin.simplemessenger.service.MessageService;
 
@@ -14,69 +17,60 @@ import java.util.Date;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
 
-    private MessageRepository messageRepository;
+    private final MessageRepository messageRepository;
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private RoomRepository roomRepository;
+    private final RoomRepository roomRepository;
 
-    private RoomRoleRepository roomRoleRepository;
+    @Override
+    public Message create(String text, long roomId, long userId) {
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(() -> new RoomNotFoundException(roomId));
 
-    public MessageServiceImpl(MessageRepository messageRepository,
-                              UserRepository userRepository,
-                              RoomRepository roomRepository,
-                              RoomRoleRepository roomRoleRepository) {
-        this.messageRepository = messageRepository;
-        this.userRepository = userRepository;
-        this.roomRepository = roomRepository;
-        this.roomRoleRepository = roomRoleRepository;
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        Message message = Message.builder()
+                .createdDate(new Date())
+                .room(room)
+                .user(user)
+                .text(text)
+                .build();
+        return messageRepository.save(message);
     }
 
     @Override
-    public boolean create(Message message, String roomTitle, long userId) {
-        try {
-            Room room = roomRepository.findByTitle(roomTitle).get();
-
-            User user = userRepository.findById(userId).get();
-
-            message.setCreatedDate(new Date());
-            message.setRoom(room);
-            message.setUser(user);
-            messageRepository.save(message);
-            return true;
-        } catch (RuntimeException runtimeException) {
-            return false;
-        }
+    public Message find(long id) {
+        return messageRepository.findById(id)
+                .orElseThrow(() -> new MessageNotFoundException(id));
     }
 
     @Override
-    public boolean delete(long id) {
-        try {
-            Message message = messageRepository.findById(id).get();
-            messageRepository.delete(message);
-            return true;
-        } catch (RuntimeException runtimeException) {
-            return false;
-        }
+    public void delete(long id) {
+        Message message = find(id);
+        messageRepository.delete(message);
     }
 
     @Override
-    public boolean update(long id, String text) {
-        try {
-            Message message = messageRepository.findById(id).get();
-            message.setText(text);
-            message.setCreatedDate(new Date());
-            messageRepository.save(message);
-            return true;
-        } catch (RuntimeException runtimeException) {
-            return false;
-        }
+    public void update(long id, String text) {
+        Message message = find(id);
+        message.setText(text);
+        message.setCreatedDate(new Date());
+        messageRepository.save(message);
     }
 
     @Override
     public List<Message> findAll(long roomId) {
         return messageRepository.findAllByRoomId(roomId);
+    }
+
+    @Override
+    public void deleteAll(long roomId) {
+        List<Message> allMessagesInRoom = messageRepository.findAllByRoomId(roomId);
+        messageRepository.deleteAll(allMessagesInRoom);
     }
 }

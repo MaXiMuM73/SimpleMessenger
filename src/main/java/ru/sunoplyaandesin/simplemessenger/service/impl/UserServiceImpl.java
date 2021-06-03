@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.sunoplyaandesin.simplemessenger.auth.JwtProvider;
 import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.domain.roles.SystemRoles;
+import ru.sunoplyaandesin.simplemessenger.exception.UserNotFoundException;
 import ru.sunoplyaandesin.simplemessenger.exception.WrongPasswordException;
 import ru.sunoplyaandesin.simplemessenger.repository.UserRepository;
 import ru.sunoplyaandesin.simplemessenger.service.UserService;
@@ -25,50 +26,41 @@ public class UserServiceImpl implements UserService {
     private final JwtProvider jwtProvider;
 
     @Override
-    public boolean create(User user) {
-        try {
-            user.setSystemRole(SystemRoles.SYSTEM_USER);
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            userRepository.save(user);
-            return true;
-        } catch (RuntimeException runtimeException) {
-            return false;
-        }
+    public User create(User user) {
+        user.setSystemRole(SystemRoles.SYSTEM_USER);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
     }
 
     @Override
-    public boolean update(User user) {
-        try {
-            User updateUser = userRepository.findByName(user.getName()).get();
-            updateUser.setName(user.getName());
-            updateUser.setPassword(passwordEncoder.encode(user.getPassword()));
-            updateUser.setSystemRole(user.getSystemRole());
-            userRepository.save(updateUser);
-            return true;
-        } catch (RuntimeException runtimeException) {
-            return false;
-        }
-    }
-
-    @Override
-    public boolean delete(String name) {
-        try {
-            User user = userRepository.findByName(name).get();
-            userRepository.delete(user);
-            return true;
-        } catch (RuntimeException runtimeException) {
-            return false;
-        }
+    public User find(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     @Override
     public User findByName(String name) {
-
-        return userRepository.findByName(name).get();
+        return userRepository.findByName(name)
+                .orElseThrow(() -> new UserNotFoundException(name));
     }
 
     @Override
-    public List<User> getAllUsers() {
+    public void update(User user) {
+        User updateUser = findByName(user.getName());
+        updateUser.setName(user.getName());
+        updateUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        updateUser.setSystemRole(user.getSystemRole());
+        userRepository.save(updateUser);
+    }
+
+    @Override
+    public void delete(String name) {
+        User user = findByName(name);
+        userRepository.delete(user);
+    }
+
+    @Override
+    public List<User> findAll() {
         return userRepository.findAll();
     }
 

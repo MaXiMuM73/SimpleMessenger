@@ -5,11 +5,16 @@ import ru.sunoplyaandesin.simplemessenger.domain.Message;
 import java.util.List;
 
 public interface MessageService {
-    boolean create(Message message, String roomTitle, long userId);
 
-    boolean delete(long id);
+    Message create(String text, long roomId, long userId);
 
-    boolean update(long id, String text);
+    Message find(long id);
+
+    void delete(long id);
+
+    void update(long id, String text);
 
     List<Message> findAll(long roomId);
+
+    void deleteAll(long roomId);
 }

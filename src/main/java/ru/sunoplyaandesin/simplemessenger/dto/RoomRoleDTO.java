@@ -1,7 +1,7 @@
 package ru.sunoplyaandesin.simplemessenger.dto;
 
 import lombok.Data;
-import ru.sunoplyaandesin.simplemessenger.domain.RoomRole;
+import ru.sunoplyaandesin.simplemessenger.domain.UserRoomRole;
 import ru.sunoplyaandesin.simplemessenger.domain.roles.RoomRoles;
 
 @Data
@@ -11,17 +11,17 @@ public class RoomRoleDTO {
 
     private RoomRoles roomRole;
 
-    public static RoomRoleDTO from(RoomRole roomRole) {
+    public static RoomRoleDTO from(UserRoomRole userRoomRole) {
         RoomRoleDTO roomRoleDTO = new RoomRoleDTO();
-        roomRoleDTO.setId(roomRole.getId());
-        roomRoleDTO.setRoomRole(roomRole.getRoomRole());
+        roomRoleDTO.setId(userRoomRole.getId());
+        roomRoleDTO.setRoomRole(userRoomRole.getRoomRole());
         return roomRoleDTO;
     }
 
-    public RoomRole toRoomRole() {
-        RoomRole roomRole = new RoomRole();
-        roomRole.setId(this.id);
-        roomRole.setRoomRole(this.roomRole);
-        return roomRole;
+    public UserRoomRole toRoomRole() {
+        UserRoomRole userRoomRole = new UserRoomRole();
+        userRoomRole.setId(this.id);
+        userRoomRole.setRoomRole(this.roomRole);
+        return userRoomRole;
     }
 }

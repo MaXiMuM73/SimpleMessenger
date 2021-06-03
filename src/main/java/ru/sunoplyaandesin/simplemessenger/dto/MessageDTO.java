@@ -9,8 +9,6 @@ import java.util.Date;
 @Data
 public class MessageDTO {
 
-    private long id;
-
     private Date createdDate;
 
     private String text;
@@ -21,7 +19,6 @@ public class MessageDTO {
 
     public static MessageDTO from(Message message) {
         MessageDTO messageDTO = new MessageDTO();
-        messageDTO.setId(message.getId());
         messageDTO.setCreatedDate(message.getCreatedDate());
         messageDTO.setText(message.getText());
         messageDTO.setUserId(message.getUser().getId());
@@ -31,7 +28,6 @@ public class MessageDTO {
 
     public Message toMessage() {
         return Message.builder()
-                .id(this.id)
                 .createdDate(this.createdDate)
                 .text(this.text)
                 .build();

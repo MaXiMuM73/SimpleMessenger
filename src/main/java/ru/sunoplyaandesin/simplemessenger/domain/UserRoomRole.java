@@ -1,41 +1,47 @@
 package ru.sunoplyaandesin.simplemessenger.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.sunoplyaandesin.simplemessenger.domain.roles.RoomRoles;
 
 import javax.persistence.*;
 
 @Entity
 @Data
-@Table(name = "rooms_roles")
-public class RoomRole {
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "users_room_roles")
+public class UserRoomRole {
 
     /**
      * Unique identifier
      */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id")
     private long id;
 
     /**
-     * User
+     * User id
      */
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "user_id", unique = true)
     private User user;
 
     /**
-     * User room
+     * Room id the user is in
      */
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
 
     /**
      * User room role
      */
-    @Column(name = "room_role", nullable = false)
+    @Column(name = "room_role")
     @Enumerated(value = EnumType.STRING)
     private RoomRoles roomRole;
 
@@ -44,18 +50,16 @@ public class RoomRole {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        RoomRole roomRole1 = (RoomRole) o;
+        UserRoomRole userRoomRole = (UserRoomRole) o;
 
-        if (!user.equals(roomRole1.user)) return false;
-        if (!room.equals(roomRole1.room)) return false;
-        return roomRole == roomRole1.roomRole;
+        if (!user.equals(userRoomRole.user)) return false;
+        return room.equals(userRoomRole.room);
     }
 
     @Override
     public int hashCode() {
         int result = user.hashCode();
         result = 31 * result + room.hashCode();
-        result = 31 * result + roomRole.hashCode();
         return result;
     }
 }

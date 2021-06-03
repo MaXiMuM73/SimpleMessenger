@@ -29,7 +29,7 @@ public class User implements UserDetails {
     private String name;
 
     /**
-     * User password
+     * User password hash
      */
     @Column(name = "password")
     private String password;
@@ -41,18 +41,11 @@ public class User implements UserDetails {
     @Enumerated(value = EnumType.STRING)
     private SystemRoles systemRole;
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", password='" + password + '\'' +
-                ", systemRole=" + systemRole +
-                '}';
-    }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserRoomRole> userRoomRoles;
 
-    @OneToMany(mappedBy = "user", cascade=CascadeType.ALL, orphanRemoval = true)
-    private List<RoomRole> roomRoles;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> messages;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -82,5 +75,13 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

@@ -40,24 +40,29 @@ public class Room {
     /**
      * Room owner
      */
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER,  cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<RoomRole> roomRoles;
+    /**
+     * Users in room
+     */
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserRoomRole> userRoomRoles;
 
-    @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    /**
+     * Messages in room
+     */
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages;
 
     @Override
     public String toString() {
         return "Room{" +
                 "id=" + id +
-                ", createdDate=" + createdDate +
                 ", title='" + title + '\'' +
                 ", privateRoom=" + privateRoom +
-                ", user=" + user +
+                ", userOwnerId=" + user.getId() +
                 '}';
     }
 }

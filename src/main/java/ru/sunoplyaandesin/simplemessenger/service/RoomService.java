@@ -6,15 +6,18 @@ import java.util.List;
 
 
 public interface RoomService {
-    boolean create(Room room, long userId);
 
-    boolean deleteByTitle(String title);
+    Room create(Room room, long userId);
 
-    boolean rename(String title, String newTitle);
+    Room find(long id);
 
-    boolean connectUser(String name, String roomTitle);
+    void delete(long id);
 
-    void connectAll(String title);
+    void rename(long id, String newTitle);
 
-    List<Room> findAll();
+    List<Room> findAll(long userId);
+
+    void connect(long userId, long roomId);
+
+    void connectAll(long roomId);
 }
