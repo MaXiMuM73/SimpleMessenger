@@ -6,26 +6,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.dto.RoomDTO;
-import ru.sunoplyaandesin.simplemessenger.service.RoomService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-
-@RestController
 @Tag(name = "Room controller", description = "Room controller description")
 @RequestMapping("/rooms")
-public class RoomController {
-
-    private RoomService roomService;
-
-    public RoomController(RoomService roomService) {
-        this.roomService = roomService;
-    }
+public interface RoomController {
 
     @Operation(
             summary = "Creating rooms",
@@ -36,13 +25,9 @@ public class RoomController {
             description = "Allows you to create a room"
     )
     @PostMapping("/create")
-    public ResponseEntity create(
+    ResponseEntity<RoomDTO> create(
             @RequestBody @Parameter(description = "RoomDTO", required = true) RoomDTO roomDTO,
-            @AuthenticationPrincipal User user) {
-        if (roomService.create(roomDTO.toRoom(), user.getId())) {
-            return ResponseEntity.ok("Room " + roomDTO.getTitle() + " created.");
-        } else return ResponseEntity.badRequest().build();
-    }
+            @AuthenticationPrincipal User user);
 
     @Operation(
             summary = "Deleting rooms",
@@ -52,16 +37,10 @@ public class RoomController {
             },
             description = "Allows you to delete a room"
     )
-    @Transactional
     @DeleteMapping("/delete")
-    public ResponseEntity delete(
-            @RequestParam(value = "title") @Parameter(description = "room title", required = true) String title) {
-        if (roomService.deleteByTitle(title)) {
-            return ResponseEntity.ok("Room " + title + " deleted.");
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+    ResponseEntity<String> delete(
+            @RequestParam(value = "roomId")
+            @Parameter(description = "room id", required = true) long id);
 
     @Operation(
             summary = "Renaming rooms",
@@ -72,41 +51,47 @@ public class RoomController {
             description = "Allows you to rename a room"
     )
     @PutMapping("/rename")
-    public ResponseEntity rename(
-            @RequestParam(value = "title")
-            @Parameter(description = "room title", required = true) String title,
-            @Parameter(description = "New title", required = true) String newTitle) {
-        if (roomService.rename(title, newTitle)) {
-            return ResponseEntity.ok("Room " + title + " renamed.");
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+    ResponseEntity<String> rename(
+            @RequestParam(value = "roomId")
+            @Parameter(description = "room id", required = true) long id,
+            @Parameter(description = "new title", required = true) String newTitle);
 
-    @GetMapping
-    public ResponseEntity findAll() {
-        List<RoomDTO> allRoomsDTO = roomService.findAll()
-                .stream().map(
-                        RoomDTO::from).collect(Collectors.toList());
-        return ResponseEntity.ok(allRoomsDTO);
-    }
+    @Operation(
+            summary = "Finding rooms",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request")
+            },
+            description = "Allows you to find all rooms"
+    )
+    @GetMapping("{userId}")
+    ResponseEntity<List<RoomDTO>> findAll(
+            @PathVariable(value = "userId") long userId);
 
+    @Operation(
+            summary = "Connecting user to room",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request")
+            },
+            description = "Allows you to connect user to room"
+    )
     @PutMapping("/connect")
-    public ResponseEntity connect(
-            @RequestParam(value = "user")
-            @Parameter(description = "user name", required = true) String name,
-            @RequestParam(value = "room_title")
-            @Parameter(description = "room title", required = true) String roomTitle) {
-        if (roomService.connectUser(name, roomTitle)) {
-            return ResponseEntity.ok("User " + name + " added to Room " + roomTitle + ".");
-        }
-        return ResponseEntity.badRequest().build();
-    }
+    ResponseEntity<String> connect(
+            @RequestParam(value = "userId")
+            @Parameter(description = "user id", required = true) long userId,
+            @RequestParam(value = "roomId")
+            @Parameter(description = "room title", required = true) long roomId);
 
+    @Operation(
+            summary = "Connecting all users to room",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request")
+            },
+            description = "Allows you to connect all users to room"
+    )
     @GetMapping("/connectAll")
-    public ResponseEntity connectAll(
-            @RequestParam(value = "title") String title) {
-        roomService.connectAll(title);
-        return ResponseEntity.ok("All users connected to room " + title);
-    }
+    ResponseEntity<String> connectAll(
+            @RequestParam(value = "roomId") long roomId);
 }

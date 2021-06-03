@@ -9,22 +9,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.dto.MessageDTO;
-import ru.sunoplyaandesin.simplemessenger.service.MessageService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-
-@RestController
 @Tag(name = "Message controller", description = "Message controller description")
 @RequestMapping("/messages")
-public class MessageController {
-
-    private MessageService messageService;
-
-    public MessageController(MessageService messageService) {
-        this.messageService = messageService;
-    }
+public interface MessageController {
 
     @Operation(
             summary = "Message creation",
@@ -34,45 +24,58 @@ public class MessageController {
             },
             description = "Allows you to create a message"
     )
-    @PostMapping("/create/{roomTitle}")
-    public ResponseEntity create(
-            @RequestBody @Parameter(description = "MessageDTO", required = true) MessageDTO messageDTO,
-            @PathVariable(name = "roomTitle") String roomTitle,
-            @AuthenticationPrincipal User user) {
-        if (messageService.create(messageDTO.toMessage(), roomTitle, user.getId())) {
-            return ResponseEntity.ok("Message " + messageDTO.getText() + " in room " + roomTitle + " created.");
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+    @PostMapping("/create/{roomId}")
+    ResponseEntity<MessageDTO> create(
+            @RequestBody @Parameter(description = "messageText", required = true) String text,
+            @PathVariable(name = "roomId") long roomId,
+            @AuthenticationPrincipal User user);
 
+    @Operation(
+            summary = "Message deleting",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request")
+            },
+            description = "Allows you to delete a message"
+    )
     @DeleteMapping("delete/{id}")
-    public ResponseEntity delete(
-            @PathVariable(name = "id") long messageId) {
-        if (messageService.delete(messageId)) {
-            return ResponseEntity.ok("Message with id " + messageId + " deleted.");
-        }
-        return ResponseEntity.badRequest().build();
-    }
+    ResponseEntity<String> delete(
+            @PathVariable(name = "id") long messageId);
 
+    @Operation(
+            summary = "Message updating",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request")
+            },
+            description = "Allows you to update a message"
+    )
     @PutMapping("{id}")
-    public ResponseEntity update(
-            @RequestParam(value = "text") String text,
-            @PathVariable(name = "id") long messageId) {
-        if (messageService.update(messageId, text)) {
-            return ResponseEntity.ok("Message with id " + messageId + " updated.");
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+    ResponseEntity<String> update(
+            @RequestBody @Parameter(description = "messageText", required = true) String text,
+            @PathVariable(name = "id") long messageId);
 
-    @GetMapping("{id}")
-    public ResponseEntity findAll(
-            @PathVariable(name = "id") long roomId) {
-        List<MessageDTO> allMessages =
-                messageService.findAll(roomId)
-                        .stream().map(
-                        MessageDTO::from).collect(Collectors.toList());
-        return ResponseEntity.ok(allMessages);
-    }
+    @Operation(
+            summary = "Message finding",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request")
+            },
+            description = "Allows you to find all messages in room"
+    )
+    @GetMapping("{roomId}")
+    ResponseEntity<List<MessageDTO>> findAll(
+            @PathVariable(name = "roomId") long roomId);
+
+    @Operation(
+            summary = "All messages deleting",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request")
+            },
+            description = "Allows you to delete all messages in room"
+    )
+    @DeleteMapping("{roomId}")
+    ResponseEntity<String> deleteAll(
+            @PathVariable(name = "roomId") long roomId);
 }

@@ -4,27 +4,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.sunoplyaandesin.simplemessenger.auth.JwtProvider;
-import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.dto.UserDTO;
-import ru.sunoplyaandesin.simplemessenger.service.UserService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-
-@RestController
 @Tag(name = "User controller", description = "User controller description")
 @RequestMapping("/users")
-@RequiredArgsConstructor
-public class UserController {
-
-    private final UserService userService;
-
-    private final JwtProvider jwtProvider;
+public interface UserController {
 
     @Operation(
             summary = "User registration",
@@ -35,35 +23,20 @@ public class UserController {
             description = "Allows you to register a user"
     )
     @PostMapping("/create")
-    public ResponseEntity create(
-            @RequestBody @Parameter(description = "UserDTO", required = true) UserDTO userDTO) {
-        if (userService.create(userDTO.toUser())) {
-            return ResponseEntity.ok("User " + userDTO.getName() + " created.");
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+    ResponseEntity<UserDTO> create(
+            @RequestBody @Parameter(description = "UserDTO", required = true) UserDTO userDTO);
 
     @Operation(
-            summary = "All users",
+            summary = "User finding",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Success"),
                     @ApiResponse(responseCode = "400", description = "Bad request")
             },
-            description = "Allows you to get all users")
-    @GetMapping
-    public ResponseEntity getAll() {
-        List<User> allUsers = userService.getAllUsers();
-        List<UserDTO> allUsersDTO = allUsers.stream()
-                .map(UserDTO::from)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(allUsersDTO);
-    }
-
-    @PostMapping("/auth")
-    public ResponseEntity<String> auth(@RequestBody UserDTO userDTO) {
-        return ResponseEntity.ok(userService.authorize(userDTO.toUser()));
-    }
+            description = "Allows you to register a user"
+    )
+    @GetMapping("{userId}")
+    ResponseEntity<UserDTO> find(
+            @PathVariable(name = "userId") long userId);
 
     @Operation(
             summary = "Updating users",
@@ -74,14 +47,28 @@ public class UserController {
             description = "Allows you to update a user"
     )
     @PutMapping("/update")
-    public ResponseEntity update(
-            @RequestBody @Parameter(description = "UserDTO", required = true) UserDTO userDTO) {
-        if (userService.update(userDTO.toUser())) {
-            return ResponseEntity.ok("User " + userDTO.getName() + " updated.");
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+    ResponseEntity<String> update(
+            @RequestBody @Parameter(description = "UserDTO", required = true) UserDTO userDTO);
+
+    @Operation(
+            summary = "All users",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request")
+            },
+            description = "Allows you to get all users")
+    @GetMapping
+    ResponseEntity<List<UserDTO>> findAll();
+
+    @Operation(
+            summary = "User Authorization",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request")
+            },
+            description = "Allows you to log in")
+    @PostMapping("/auth")
+    ResponseEntity<String> auth(@RequestBody UserDTO userDTO);
 
     @Operation(
             summary = "Deleting users",
@@ -92,11 +79,5 @@ public class UserController {
             description = "Allows you to delete a user"
     )
     @DeleteMapping("/delete")
-    public ResponseEntity deleteByName(@RequestParam (value = "name") String name) {
-        if (userService.delete(name)) {
-            return ResponseEntity.ok("User " + name + " deleted.");
-        } else  {
-            return ResponseEntity.badRequest().build();
-        }
-    }
+    ResponseEntity<String> deleteByName(@RequestParam(value = "name") String name);
 }
