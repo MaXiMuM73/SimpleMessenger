@@ -53,8 +53,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public void rename(long id, String newTitle) {
-        Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new RoomNotFoundException(id));
+        Room room = find(id);
         room.setTitle(newTitle);
         roomRepository.save(room);
     }
