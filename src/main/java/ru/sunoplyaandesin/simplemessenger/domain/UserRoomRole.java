@@ -28,7 +28,7 @@ public class UserRoomRole {
      * User id
      */
     @ManyToOne
-    @JoinColumn(name = "user_id", unique = true)
+    @JoinColumn(name = "user_id")
     private User user;
 
     /**

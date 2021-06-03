@@ -48,7 +48,7 @@ public class Room {
      * Users in room
      */
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserRoomRole> userRoomRoles;
+    private Set<UserRoomRole> userRoomRoles = new HashSet<>();
 
     /**
      * Messages in room
@@ -64,5 +64,23 @@ public class Room {
                 ", privateRoom=" + privateRoom +
                 ", userOwnerId=" + user.getId() +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Room room = (Room) o;
+
+        if (id != room.id) return false;
+        return title.equals(room.title);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + title.hashCode();
+        return result;
     }
 }

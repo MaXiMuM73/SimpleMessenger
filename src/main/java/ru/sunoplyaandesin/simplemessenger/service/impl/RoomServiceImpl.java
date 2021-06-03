@@ -7,11 +7,9 @@ import ru.sunoplyaandesin.simplemessenger.domain.UserRoomRole;
 import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.domain.roles.RoomRoles;
 import ru.sunoplyaandesin.simplemessenger.exception.RoomNotFoundException;
-import ru.sunoplyaandesin.simplemessenger.exception.UserNotFoundException;
 import ru.sunoplyaandesin.simplemessenger.repository.RoomRepository;
-import ru.sunoplyaandesin.simplemessenger.repository.UserRoomRoleRepository;
-import ru.sunoplyaandesin.simplemessenger.repository.UserRepository;
 import ru.sunoplyaandesin.simplemessenger.service.RoomService;
+import ru.sunoplyaandesin.simplemessenger.service.UserService;
 
 import java.util.*;
 
@@ -21,17 +19,24 @@ public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
 
-    private final UserRepository userRepository;
-
-    private final UserRoomRoleRepository userRoomRoleRepository;
+    private final UserService userService;
 
     @Override
     public Room create(Room room, long userId) {
-        User user = userRepository.findById(userId).get();
+        User user = userService.find(userId);
+
         room.setCreatedDate(new Date());
         room.setUser(user);
-        roomRepository.save(room);
-        return room;
+
+        room.getUserRoomRoles()
+                .add(UserRoomRole.builder()
+                        .room(room)
+                        .user(user)
+                        .roomRole(RoomRoles.ROOM_OWNER)
+                        .build()
+        );
+
+        return roomRepository.save(room);
     }
 
     @Override
@@ -56,42 +61,27 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public void connect(long userId, long roomId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+        User user = userService.find(userId);
 
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new RoomNotFoundException(roomId));
+        Room room = find(roomId);
 
-        UserRoomRole userRoomRole = UserRoomRole.builder()
-                .user(user)
-                .room(room)
-                .roomRole(RoomRoles.ROOM_USER)
-                .build();
+        room.getUserRoomRoles()
+                .add(UserRoomRole.builder()
+                        .room(room)
+                        .user(user)
+                        .roomRole(RoomRoles.ROOM_USER)
+                        .build()
+                );
 
-        userRoomRoleRepository.save(userRoomRole);
+        roomRepository.save(room);
     }
 
     @Override
     public void connectAll(long roomId) {
-        Room room = roomRepository.findById(roomId)
-                .orElseThrow(() -> new RoomNotFoundException(roomId));
-        List<User> allUsers = userRepository.findAll();
-
-        Set<UserRoomRole> allUsersInRoom = userRoomRoleRepository.findAllByRoomId(room.getId());
-
-        Set<UserRoomRole> newUsersToAdd = new HashSet<>();
-
+        List<User> allUsers = userService.findAll();
         for (User user : allUsers) {
-            UserRoomRole userRoomRole = UserRoomRole.builder()
-                    .room(room)
-                    .user(user)
-                    .roomRole(RoomRoles.ROOM_USER)
-                    .build();
-            if (!allUsersInRoom.contains(userRoomRole)) {
-                newUsersToAdd.add(userRoomRole);
-            }
+            connect(user.getId(), roomId);
         }
-        userRoomRoleRepository.saveAll(newUsersToAdd);
     }
 
     @Override
