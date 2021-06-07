@@ -5,10 +5,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.sunoplyaandesin.simplemessenger.auth.JwtProvider;
+import ru.sunoplyaandesin.simplemessenger.domain.Room;
 import ru.sunoplyaandesin.simplemessenger.domain.User;
+import ru.sunoplyaandesin.simplemessenger.domain.UserRoomRole;
+import ru.sunoplyaandesin.simplemessenger.domain.roles.RoomRoles;
 import ru.sunoplyaandesin.simplemessenger.domain.roles.SystemRoles;
 import ru.sunoplyaandesin.simplemessenger.exception.UserNotFoundException;
 import ru.sunoplyaandesin.simplemessenger.exception.WrongPasswordException;
+import ru.sunoplyaandesin.simplemessenger.repository.RoomRepository;
 import ru.sunoplyaandesin.simplemessenger.repository.UserRepository;
 import ru.sunoplyaandesin.simplemessenger.service.UserService;
 
@@ -20,6 +24,8 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+
+    private final RoomRepository roomRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -80,5 +86,29 @@ public class UserServiceImpl implements UserService {
         }
 
         return jwtProvider.generateToken(user.getName());
+    }
+
+    @Override
+    public String setRoomRole(String userName, String roomRole, long roomId, long id) {
+        User user = find(id);
+
+        Room room = roomRepository.findById(roomId).get();
+
+        UserRoomRole userOwner = user.getUserRoomRoles().stream()
+                .filter(userRoomRole -> userRoomRole.getRoom().equals(room))
+                .findAny().orElse(null);
+
+        if (userOwner != null & userOwner.getRoomRole().equals(RoomRoles.ROOM_OWNER)) {
+            User userUpdate = findByName(userName);
+            UserRoomRole userUpdateRoomRole = userUpdate.getUserRoomRoles().stream()
+                    .filter(userRoomRole -> userRoomRole.getRoom().equals(room))
+                    .findAny().orElse(null);
+
+            if (userUpdateRoomRole != null) {
+                userUpdateRoomRole.setRoomRole(RoomRoles.valueOf(roomRole));
+                userRepository.save(userUpdate);
+            }
+        }
+        return roomRole;
     }
 }

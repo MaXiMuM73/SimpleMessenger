@@ -5,7 +5,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.dto.UserDTO;
 
 import java.util.List;
@@ -80,4 +82,19 @@ public interface UserController {
     )
     @DeleteMapping("/delete")
     ResponseEntity<String> deleteByName(@RequestParam(value = "name") String name);
+
+    @Operation(
+            summary = "Set room role",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request")
+            },
+            description = "Allows you set or downgrade room role to user"
+    )
+    @PutMapping("/moderator/{userName}")
+    ResponseEntity<String> setModerator(
+            @PathVariable(name = "userName") String userName,
+            @RequestParam(value = "userRole") String roomRole,
+            @RequestParam(value = "roomId") long roomId,
+            @AuthenticationPrincipal User user);
 }

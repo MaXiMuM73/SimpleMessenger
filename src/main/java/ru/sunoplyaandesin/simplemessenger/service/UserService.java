@@ -22,4 +22,6 @@ public interface UserService {
     User findByNameAndPassword(String name, String password);
 
     String authorize(User user);
+
+    String setRoomRole(String userName, String roomRole, long roomId, long id);
 }

@@ -55,4 +55,11 @@ public class UserControllerImpl implements UserController {
         userService.delete(name);
         return ResponseEntity.ok("User " + name + " deleted.");
     }
+
+    @Override
+    public ResponseEntity<String> setModerator(String userName, String roomRole,
+                                               long roomId, User user) {
+        userService.setRoomRole(userName, roomRole, roomId, user.getId());
+        return ResponseEntity.ok(userName + " room role: " + roomRole);
+    }
 }

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import ru.sunoplyaandesin.simplemessenger.domain.roles.RoomRoles;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Data
@@ -44,6 +45,9 @@ public class UserRoomRole {
     @Column(name = "room_role")
     @Enumerated(value = EnumType.STRING)
     private RoomRoles roomRole;
+
+    @Column(name = "available_login_time")
+    private Date availableLoginTime;
 
     @Override
     public boolean equals(Object o) {
