@@ -1,23 +1,31 @@
 package ru.sunoplyaandesin.simplemessenger.service;
 
 import ru.sunoplyaandesin.simplemessenger.domain.Room;
+import ru.sunoplyaandesin.simplemessenger.domain.User;
+import ru.sunoplyaandesin.simplemessenger.dto.RoomDTO;
 
 import java.util.List;
 
 
 public interface RoomService {
 
-    Room create(Room room, long userId);
+    RoomDTO create(RoomDTO roomDTO, long userId);
 
-    Room find(long id);
+    RoomDTO find(long id);
 
-    void delete(long id);
+    RoomDTO find(String title);
 
-    void rename(long id, String newTitle);
+    boolean delete(long id, long userId);
 
-    List<Room> findAll(long userId);
+    boolean rename(long id, String newTitle, long userId);
 
-    void connect(long userId, long roomId);
+    List<RoomDTO> findAll(long userId);
 
-    void connectAll(long roomId);
+    boolean connect(long userIdToConnect, long roomId);
+
+    void connectAll(long roomId, long userId);
+
+    boolean disconnect(long roomId, long userId);
+
+    boolean disconnect(String roomTitle, long userIdToDisconnect, long banTime, long userId);
 }

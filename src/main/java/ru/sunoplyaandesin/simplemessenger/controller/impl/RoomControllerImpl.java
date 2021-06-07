@@ -4,13 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.sunoplyaandesin.simplemessenger.controller.RoomController;
-import ru.sunoplyaandesin.simplemessenger.domain.Room;
 import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.dto.RoomDTO;
 import ru.sunoplyaandesin.simplemessenger.service.RoomService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @RestController
@@ -21,40 +19,61 @@ public class RoomControllerImpl implements RoomController {
 
     @Override
     public ResponseEntity<RoomDTO> create(RoomDTO roomDTO, User user) {
-        Room room = roomService.create(roomDTO.toRoom(), user.getId());
-        return ResponseEntity.ok(RoomDTO.from(room));
+        return ResponseEntity.ok(roomService.create(roomDTO, user.getId()));
     }
 
     @Override
-    public ResponseEntity<String> delete(long id) {
-        roomService.delete(id);
-        return ResponseEntity.ok("Room with id " + id + " deleted.");
+    public ResponseEntity<String> delete(long id, User user) {
+        if (roomService.delete(id, user.getId())) {
+            return ResponseEntity.ok("Room with id " + id + " deleted.");
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @Override
-    public ResponseEntity<String> rename(long id, String newTitle) {
-        roomService.rename(id, newTitle);
-        return ResponseEntity.ok("Room with id " + id + " renamed to " +
-                newTitle + ".");
+    public ResponseEntity<String> rename(long id, String newTitle, User user) {
+        if (roomService.rename(id, newTitle, user.getId())) {
+            return ResponseEntity.ok("Room with id " + id + " renamed.");
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @Override
     public ResponseEntity<List<RoomDTO>> findAll(long userId) {
-        List<RoomDTO> allRoomsDTO = roomService.findAll(userId)
-                .stream().map(
-                        RoomDTO::from).collect(Collectors.toList());
-        return ResponseEntity.ok(allRoomsDTO);
+        return ResponseEntity.ok(roomService.findAll(userId));
     }
 
     @Override
     public ResponseEntity<String> connect(long userId, long roomId) {
-        roomService.connect(userId, roomId);
-        return ResponseEntity.ok("User with id " + userId + " connected to room with id " + roomId);
+        if (roomService.connect(userId, roomId)) {
+            return ResponseEntity.ok("User with id " + userId
+                    + " connected to room with id " + roomId);
+        } else {
+            return ResponseEntity.ok("User with id " + userId
+                    + " can't connect to room with id " + roomId);
+        }
     }
 
     @Override
-    public ResponseEntity<String> connectAll(long roomId) {
-        roomService.connectAll(roomId);
+    public ResponseEntity<String> connectAll(long roomId, User user) {
+        roomService.connectAll(roomId, user.getId());
         return ResponseEntity.ok("All users connected to room with id " + roomId);
+    }
+
+    @Override
+    public ResponseEntity<String> disconnect(long roomId, User user) {
+        roomService.disconnect(roomId, user.getId());
+        return ResponseEntity.ok("User with id " + user.getId()
+                + " disconnected from room with id " + roomId);
+    }
+
+    @Override
+    public ResponseEntity<String> disconnect(String roomTitle, long userIdToDisconnect,
+                                             long banTime, User user) {
+        roomService.disconnect(roomTitle, userIdToDisconnect, banTime, user.getId());
+        return ResponseEntity.ok("User with id " + userIdToDisconnect
+                + " disconnected from room with title " + roomTitle);
     }
 }

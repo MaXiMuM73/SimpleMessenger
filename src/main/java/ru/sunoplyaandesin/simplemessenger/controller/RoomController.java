@@ -40,7 +40,8 @@ public interface RoomController {
     @DeleteMapping("/delete")
     ResponseEntity<String> delete(
             @RequestParam(value = "roomId")
-            @Parameter(description = "room id", required = true) long id);
+            @Parameter(description = "room id", required = true) long id,
+            @AuthenticationPrincipal User user);
 
     @Operation(
             summary = "Renaming rooms",
@@ -54,7 +55,9 @@ public interface RoomController {
     ResponseEntity<String> rename(
             @RequestParam(value = "roomId")
             @Parameter(description = "room id", required = true) long id,
-            @Parameter(description = "new title", required = true) String newTitle);
+            @RequestParam(value = "newTitle")
+            @Parameter(description = "new title", required = true) String newTitle,
+            @AuthenticationPrincipal User user);
 
     @Operation(
             summary = "Finding rooms",
@@ -93,5 +96,37 @@ public interface RoomController {
     )
     @GetMapping("/connectAll")
     ResponseEntity<String> connectAll(
-            @RequestParam(value = "roomId") long roomId);
+            @RequestParam(value = "roomId") long roomId,
+            @AuthenticationPrincipal User user);
+
+    @Operation(
+            summary = "Disconnecting user from room",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request")
+            },
+            description = "Allows you to disconnect user from room"
+    )
+    @DeleteMapping("/disconnect")
+    ResponseEntity<String> disconnect(
+            @RequestParam(value = "roomId")
+            @Parameter(description = "room title", required = true) long roomId,
+            @AuthenticationPrincipal User user);
+
+    @Operation(
+            summary = "Disconnecting user from room and ban",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request")
+            },
+            description = "Allows you to disconnect user from room and ban"
+    )
+    @DeleteMapping("/disconnect/{roomTitle}")
+    ResponseEntity<String> disconnect(
+            @PathVariable(name = "roomTitle") String roomTitle,
+            @RequestParam(value = "userId")
+            @Parameter(description = "user id", required = true) long userIdToDisconnect,
+            @RequestParam(value = "banTime")
+            @Parameter(description = "ban param", required = false) long banTime,
+            @AuthenticationPrincipal User user);
 }
