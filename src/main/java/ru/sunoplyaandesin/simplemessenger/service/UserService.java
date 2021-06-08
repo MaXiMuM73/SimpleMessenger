@@ -1,27 +1,30 @@
 package ru.sunoplyaandesin.simplemessenger.service;
 
 import ru.sunoplyaandesin.simplemessenger.domain.User;
+import ru.sunoplyaandesin.simplemessenger.dto.UserDTO;
 
 import java.util.List;
 
 
 public interface UserService {
 
-    User create(User user);
+    UserDTO create(UserDTO userDTO);
 
-    User find(long id);
+    UserDTO find(long id);
 
-    User findByName(String name);
+    UserDTO find(String name);
 
-    void update(User user);
+    User findUser(long id);
+
+    UserDTO update(UserDTO userDTO);
 
     void delete(String name);
 
-    List<User> findAll();
+    List<User> findAllUsers();
 
-    User findByNameAndPassword(String name, String password);
+    List<UserDTO> findAll();
 
-    String authorize(User user);
+    String authorize(UserDTO userDTO);
 
     String setRoomRole(String userName, String roomRole, long roomId, long id);
 }

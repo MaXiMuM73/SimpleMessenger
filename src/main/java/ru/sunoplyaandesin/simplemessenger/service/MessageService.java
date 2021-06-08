@@ -1,20 +1,20 @@
 package ru.sunoplyaandesin.simplemessenger.service;
 
-import ru.sunoplyaandesin.simplemessenger.domain.Message;
+import ru.sunoplyaandesin.simplemessenger.dto.MessageDTO;
 
 import java.util.List;
 
 public interface MessageService {
 
-    Message create(String text, long roomId, long userId);
+    MessageDTO create(String text, long roomId, long userId);
 
-    Message find(long id);
+    MessageDTO find(long id);
 
     void delete(long id);
 
     void update(long id, String text);
 
-    List<Message> findAll(long roomId);
+    List<MessageDTO> findAll(long roomId);
 
     void deleteAll(long roomId);
 }

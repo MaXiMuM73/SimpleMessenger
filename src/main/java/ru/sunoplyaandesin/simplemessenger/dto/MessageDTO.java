@@ -13,23 +13,16 @@ public class MessageDTO {
 
     private String text;
 
-    private long userId;
+    private UserDTO user;
 
-    private long roomId;
+    private RoomDTO room;
 
     public static MessageDTO from(Message message) {
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setCreatedDate(message.getCreatedDate());
         messageDTO.setText(message.getText());
-        messageDTO.setUserId(message.getUser().getId());
-        messageDTO.setRoomId(message.getRoom().getId());
+//        messageDTO.setUserId(message.getUser().getId());
+//        messageDTO.setRoomId(message.getRoom().getId());
         return messageDTO;
-    }
-
-    public Message toMessage() {
-        return Message.builder()
-                .createdDate(this.createdDate)
-                .text(this.text)
-                .build();
     }
 }

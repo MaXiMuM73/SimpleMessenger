@@ -8,7 +8,8 @@ import ru.sunoplyaandesin.simplemessenger.domain.UserRoomRole;
 import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.domain.roles.RoomRoles;
 import ru.sunoplyaandesin.simplemessenger.dto.RoomDTO;
-import ru.sunoplyaandesin.simplemessenger.dto.mapper.RoomMapper;
+import ru.sunoplyaandesin.simplemessenger.repository.UserRepository;
+import ru.sunoplyaandesin.simplemessenger.service.mapper.RoomMapper;
 import ru.sunoplyaandesin.simplemessenger.exception.RoomNotFoundException;
 import ru.sunoplyaandesin.simplemessenger.exception.UserRoomRoleNotFoundException;
 import ru.sunoplyaandesin.simplemessenger.repository.RoomRepository;
@@ -25,6 +26,8 @@ public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
 
+    private final UserRepository userRepository;
+
     private final UserService userService;
 
     private final RoomMapper roomMapper;
@@ -33,7 +36,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public RoomDTO create(RoomDTO roomDTO, long userId) {
-        User user = userService.find(userId);
+        User user = userService.findUser(userId);
 
         Room room = roomMapper.toRoom(roomDTO);
 
@@ -65,7 +68,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public boolean delete(long id, long userId) {
-        User user = userService.find(userId);
+        User user = userService.findUser(userId);
 
         Room room = findById(id);
 
@@ -84,7 +87,7 @@ public class RoomServiceImpl implements RoomService {
     public boolean rename(long id, String newTitle, long userId) {
         Room room = findById(id);
 
-        User user = userService.find(userId);
+        User user = userService.findUser(userId);
 
         UserRoomRole userRoomRole = getUserRoomRole(user, room);
 
@@ -100,7 +103,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public boolean connect(long userIdToConnect, long roomId) {
-        User userToConnect = userService.find(userIdToConnect);
+        User userToConnect = userService.findUser(userIdToConnect);
 
         Room room = findById(roomId);
 
@@ -132,7 +135,7 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public void connectAll(long roomId, long userId) {
-        List<User> allUsers = userService.findAll();
+        List<User> allUsers = userService.findAllUsers();
 
         for (User user : allUsers) {
             connect(user.getId(), roomId);
@@ -143,7 +146,7 @@ public class RoomServiceImpl implements RoomService {
     public boolean disconnect(long roomId, long userId) {
         Room room = findById(roomId);
 
-        User user = userService.find(userId);
+        User user = userService.findUser(userId);
 
         UserRoomRole userRoomRole = user.getUserRoomRoles()
                 .stream().filter(role -> role.getRoom().equals(room))
@@ -155,7 +158,8 @@ public class RoomServiceImpl implements RoomService {
 
         user.getUserRoomRoles().remove(userRoomRole);
 
-        userService.update(user);
+        userRepository.save(user);
+//        userService.update(user);
 
         return true;
     }
@@ -165,9 +169,9 @@ public class RoomServiceImpl implements RoomService {
                               long banTime, long userId) {
         Room room = findByTitle(roomTitle);
 
-        User userToDisconnect = userService.find(userIdToDisconnect);
+        User userToDisconnect = userService.findUser(userIdToDisconnect);
 
-        User user = userService.find(userId);
+        User user = userService.findUser(userId);
 
         UserRoomRole userRoomRole = getUserRoomRole(user, room);
         if (!userRoomRole.getRoomRole().equals(RoomRoles.ROOM_OWNER) |
@@ -190,7 +194,8 @@ public class RoomServiceImpl implements RoomService {
                             .availableLoginTime(ban)
                             .build()
             );
-            userService.update(userToDisconnect);
+            userRepository.save(userToDisconnect);
+//            userService.update(userToDisconnect);
         }
         roomRepository.save(room);
         return true;

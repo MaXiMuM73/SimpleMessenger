@@ -49,7 +49,7 @@ public interface UserController {
             description = "Allows you to update a user"
     )
     @PutMapping("/update")
-    ResponseEntity<String> update(
+    ResponseEntity<UserDTO> update(
             @RequestBody @Parameter(description = "UserDTO", required = true) UserDTO userDTO);
 
     @Operation(

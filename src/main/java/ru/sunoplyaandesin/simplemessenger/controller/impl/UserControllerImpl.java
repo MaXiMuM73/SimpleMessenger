@@ -20,34 +20,27 @@ public class UserControllerImpl implements UserController {
 
     @Override
     public ResponseEntity<UserDTO> create(UserDTO userDTO) {
-        User user = userService.create(userDTO.toUser());
-        return ResponseEntity.ok(UserDTO.from(user));
+        return ResponseEntity.ok(userService.create(userDTO));
     }
 
     @Override
     public ResponseEntity<UserDTO> find(long userId) {
-        User user = userService.find(userId);
-        return ResponseEntity.ok(UserDTO.from(user));
+        return ResponseEntity.ok(userService.find(userId));
     }
 
     @Override
-    public ResponseEntity<String> update(UserDTO userDTO) {
-        userService.update(userDTO.toUser());
-        return ResponseEntity.ok("User with name " + userDTO.getName() + " updated.");
+    public ResponseEntity<UserDTO> update(UserDTO userDTO) {
+        return ResponseEntity.ok(userService.update(userDTO));
     }
 
     @Override
     public ResponseEntity<List<UserDTO>> findAll() {
-        List<User> allUsers = userService.findAll();
-        List<UserDTO> allUsersDTO = allUsers.stream()
-                .map(UserDTO::from)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(allUsersDTO);
+        return ResponseEntity.ok(userService.findAll());
     }
 
     @Override
     public ResponseEntity<String> auth(UserDTO userDTO) {
-        return ResponseEntity.ok(userService.authorize(userDTO.toUser()));
+        return ResponseEntity.ok(userService.authorize(userDTO));
     }
 
     @Override

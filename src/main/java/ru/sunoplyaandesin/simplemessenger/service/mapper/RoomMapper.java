@@ -1,4 +1,4 @@
-package ru.sunoplyaandesin.simplemessenger.dto.mapper;
+package ru.sunoplyaandesin.simplemessenger.service.mapper;
 
 import org.mapstruct.Mapper;
 import ru.sunoplyaandesin.simplemessenger.domain.Room;

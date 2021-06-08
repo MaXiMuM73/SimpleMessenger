@@ -4,13 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.sunoplyaandesin.simplemessenger.controller.MessageController;
-import ru.sunoplyaandesin.simplemessenger.domain.Message;
 import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.dto.MessageDTO;
 import ru.sunoplyaandesin.simplemessenger.service.MessageService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @RestController
@@ -21,8 +19,7 @@ public class MessageControllerImpl implements MessageController {
 
     @Override
     public ResponseEntity<MessageDTO> create(String text, long roomId, User user) {
-        Message message = messageService.create(text, roomId, user.getId());
-        return ResponseEntity.ok(MessageDTO.from(message));
+        return ResponseEntity.ok(messageService.create(text, roomId, user.getId()));
     }
 
     @Override
@@ -39,11 +36,7 @@ public class MessageControllerImpl implements MessageController {
 
     @Override
     public ResponseEntity<List<MessageDTO>> findAll(long roomId) {
-        List<MessageDTO> allMessages =
-                messageService.findAll(roomId)
-                        .stream().map(
-                        MessageDTO::from).collect(Collectors.toList());
-        return ResponseEntity.ok(allMessages);
+        return ResponseEntity.ok(messageService.findAll(roomId));
     }
 
     @Override
