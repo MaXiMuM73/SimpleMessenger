@@ -5,23 +5,17 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import ru.sunoplyaandesin.simplemessenger.dto.MessageDTO;
-import ru.sunoplyaandesin.simplemessenger.dto.response.MessageText;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import ru.sunoplyaandesin.simplemessenger.service.YBotService;
 
 @Controller
 @RequiredArgsConstructor
 public class WebSocketController {
 
+    private final YBotService yBotService;
+
     @MessageMapping("/hello")
     @SendTo("/topic/greetings")
-    public MessageText sendMessage(MessageDTO messageDTO) {
-        MessageDTO response = new MessageDTO();
-        response.setText(messageDTO.getText());
-        response.setCreatedDate(new Date());
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm");
-        return new MessageText(simpleDateFormat.format(response.getCreatedDate()) + " "
-                + response.getText());
+    public MessageDTO sendMessageNew(MessageDTO messageDTO) {
+        return yBotService.sendMessage(messageDTO.getText());
     }
 }

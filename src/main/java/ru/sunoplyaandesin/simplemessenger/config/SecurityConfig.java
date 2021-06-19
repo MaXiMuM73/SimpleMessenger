@@ -7,11 +7,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ru.sunoplyaandesin.simplemessenger.auth.JwtFilter;
+import ru.sunoplyaandesin.simplemessenger.domain.roles.SystemRoles;
 
 @Configuration
 @EnableWebSecurity
@@ -19,8 +19,6 @@ import ru.sunoplyaandesin.simplemessenger.auth.JwtFilter;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtFilter jwtFilter;
-
-    private final UserDetailsService userDetailsService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -31,9 +29,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
-//                .antMatchers(AUTH_WHITELIST).permitAll()
-//                .antMatchers("/users/create", "/users/auth").permitAll()
-////                .antMatchers("/users/delete").hasAuthority(SystemRoles.SYSTEM_ADMIN.name())
+                .antMatchers("/?").permitAll()
+                .antMatchers(AUTH_WHITELIST).permitAll()
+                .antMatchers("/users/create", "/users/auth").permitAll()
+                .antMatchers("/users/delete").hasAuthority(SystemRoles.SYSTEM_ADMIN.name())
 //                .antMatchers("/**").authenticated()
                 .and()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
