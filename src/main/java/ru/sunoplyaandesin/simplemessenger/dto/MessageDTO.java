@@ -1,12 +1,16 @@
 package ru.sunoplyaandesin.simplemessenger.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import ru.sunoplyaandesin.simplemessenger.domain.Message;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
-
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MessageDTO {
 
     private Date createdDate;
@@ -16,13 +20,4 @@ public class MessageDTO {
     private UserDTO user;
 
     private RoomDTO room;
-
-    public static MessageDTO from(Message message) {
-        MessageDTO messageDTO = new MessageDTO();
-        messageDTO.setCreatedDate(message.getCreatedDate());
-        messageDTO.setText(message.getText());
-//        messageDTO.setUserId(message.getUser().getId());
-//        messageDTO.setRoomId(message.getRoom().getId());
-        return messageDTO;
-    }
 }
