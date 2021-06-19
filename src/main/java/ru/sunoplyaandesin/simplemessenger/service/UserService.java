@@ -26,5 +26,5 @@ public interface UserService {
 
     String authorize(UserDTO userDTO);
 
-    String setRoomRole(String userName, String roomRole, long roomId, long id);
+    void setRoomRole(String userName, String roomRole, long roomId, long id);
 }

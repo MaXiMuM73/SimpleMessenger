@@ -1,7 +1,5 @@
 package ru.sunoplyaandesin.simplemessenger.service;
 
-import ru.sunoplyaandesin.simplemessenger.domain.Room;
-import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.dto.RoomDTO;
 
 import java.util.List;

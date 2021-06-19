@@ -16,7 +16,6 @@ import ru.sunoplyaandesin.simplemessenger.exception.WrongPasswordException;
 import ru.sunoplyaandesin.simplemessenger.repository.RoomRepository;
 import ru.sunoplyaandesin.simplemessenger.repository.UserRepository;
 import ru.sunoplyaandesin.simplemessenger.service.UserService;
-import ru.sunoplyaandesin.simplemessenger.service.mapper.RoomMapper;
 import ru.sunoplyaandesin.simplemessenger.service.mapper.UserMapper;
 
 import java.util.List;
@@ -104,7 +103,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String setRoomRole(String userName, String roomRole, long roomId, long id) {
+    public void setRoomRole(String userName, String roomRole, long roomId, long id) {
         User user = findById(id);
 
         Room room = roomRepository.findById(roomId).get();
@@ -124,7 +123,6 @@ public class UserServiceImpl implements UserService {
                 userRepository.save(userUpdate);
             }
         }
-        return roomRole;
     }
 
     private User findById(long id) {
