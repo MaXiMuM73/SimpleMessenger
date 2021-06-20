@@ -15,7 +15,7 @@ public class WebSocketController {
 
     @MessageMapping("/hello")
     @SendTo("/topic/greetings")
-    public MessageDTO sendMessageNew(MessageDTO messageDTO) {
-        return yBotService.sendMessage(messageDTO.getText());
+    public void sendMessage(MessageDTO messageDTO) {
+        yBotService.sendMessage(messageDTO.getText());
     }
 }
