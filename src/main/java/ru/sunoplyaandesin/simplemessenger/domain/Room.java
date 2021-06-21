@@ -5,6 +5,9 @@ import lombok.Data;
 import javax.persistence.*;
 import java.util.*;
 
+/**
+ * User room
+ */
 @Entity
 @Data
 @Table(name = "rooms")

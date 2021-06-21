@@ -9,6 +9,9 @@ import ru.sunoplyaandesin.simplemessenger.domain.roles.SystemRoles;
 import javax.persistence.*;
 import java.util.*;
 
+/**
+ * Application user
+ */
 @Entity
 @Data
 @Table(name = "users")
@@ -41,12 +44,21 @@ public class User implements UserDetails {
     @Enumerated(value = EnumType.STRING)
     private SystemRoles systemRole;
 
+    /**
+     * User room roles
+     */
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserRoomRole> userRoomRoles;
 
+    /**
+     * User messages
+     */
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages;
 
+    /**
+     * User rooms
+     */
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Room> rooms;
 
@@ -57,7 +69,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return null;
+        return name;
     }
 
     @Override

@@ -9,6 +9,9 @@ import ru.sunoplyaandesin.simplemessenger.domain.roles.RoomRoles;
 import javax.persistence.*;
 import java.util.Date;
 
+/**
+ * User room role
+ */
 @Entity
 @Data
 @Builder
@@ -46,6 +49,9 @@ public class UserRoomRole {
     @Enumerated(value = EnumType.STRING)
     private RoomRoles roomRole;
 
+    /**
+     * User login time available
+     */
     @Column(name = "available_login_time")
     private Date availableLoginTime;
 
