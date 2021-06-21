@@ -1,14 +1,13 @@
 package ru.sunoplyaandesin.simplemessenger.service.command.impl;
 
-import ru.sunoplyaandesin.simplemessenger.dto.MessageDTO;
 import ru.sunoplyaandesin.simplemessenger.service.YBotService;
 import ru.sunoplyaandesin.simplemessenger.service.command.Command;
-
-import java.util.List;
 
 public class RandomCommentCommand implements Command {
 
     private final YBotService yBotService;
+
+    public static final String RANDOM_COMMENT_MESSAGE = "Random comment command. Returns random video comment.";
 
     public RandomCommentCommand(YBotService yBotService) {
         this.yBotService = yBotService;
@@ -24,12 +23,8 @@ public class RandomCommentCommand implements Command {
         String videoTitle = channelTitleAndVideoTitle
                 .substring(beginOfVideoTitle + 1);
 
-        List<MessageDTO> messagesDTO = yBotService.videoCommentRandom(channelTitle, videoTitle);
+        yBotService.videoCommentRandom(channelTitle, videoTitle);
 
-        StringBuilder message = new StringBuilder();
-
-        messagesDTO.forEach(m -> message.append(m.getText()).append(" "));
-
-        return message.toString();
+        return RANDOM_COMMENT_MESSAGE;
     }
 }

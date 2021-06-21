@@ -7,6 +7,8 @@ public class ChannelInfoCommand implements Command {
 
     private final YBotService yBotService;
 
+    public static final String CHANNEL_INFO_MESSAGE = "Channel info command. Returns last five uploaded videos links.";
+
     public ChannelInfoCommand(YBotService yBotService) {
         this.yBotService = yBotService;
     }
@@ -14,6 +16,6 @@ public class ChannelInfoCommand implements Command {
     @Override
     public String execute(String channelTitle) {
         yBotService.channelInfo(channelTitle);
-        return channelTitle;
+        return CHANNEL_INFO_MESSAGE;
     }
 }

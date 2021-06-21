@@ -7,7 +7,7 @@ public class HelpCommand implements Command {
 
     private final YBotService yBotService;
 
-    public static final String HELP_MESSAGE = "yBot commands: " +
+    public static final String HELP_MESSAGE = "Commands: " +
             "//help - print all commands, " +
             "//channelinfo {channel title} - print last five video links, " +
             "//randomcomment {channel title}||{video title} - print random comment.";
