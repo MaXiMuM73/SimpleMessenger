@@ -9,9 +9,9 @@ CREATE TABLE IF NOT EXISTS public.users_room_roles
     CONSTRAINT room_id FOREIGN KEY (room_id)
         REFERENCES public.rooms (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
+        ON DELETE CASCADE,
     CONSTRAINT user_id FOREIGN KEY (user_id)
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+        ON DELETE CASCADE
 )
