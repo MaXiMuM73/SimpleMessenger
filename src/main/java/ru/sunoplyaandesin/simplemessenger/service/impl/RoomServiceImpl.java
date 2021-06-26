@@ -8,6 +8,7 @@ import ru.sunoplyaandesin.simplemessenger.domain.UserRoomRole;
 import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.domain.roles.RoomRoles;
 import ru.sunoplyaandesin.simplemessenger.dto.RoomDTO;
+import ru.sunoplyaandesin.simplemessenger.exception.UserNotFoundException;
 import ru.sunoplyaandesin.simplemessenger.repository.UserRepository;
 import ru.sunoplyaandesin.simplemessenger.service.mapper.RoomMapper;
 import ru.sunoplyaandesin.simplemessenger.exception.RoomNotFoundException;
@@ -34,6 +35,7 @@ public class RoomServiceImpl implements RoomService {
 
     private final UserRoomRoleRepository userRoomRoleRepository;
 
+    //TODO unique room title
     @Override
     public RoomDTO create(RoomDTO roomDTO, long userId) {
         User user = userService.findUser(userId);
@@ -84,8 +86,43 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    public boolean delete(String roomTitle, long userId) {
+        User user = userService.findUser(userId);
+
+        Room room = findByTitle(roomTitle);
+
+        UserRoomRole userRoomRole = getUserRoomRole(user, room);
+
+        if (userRoomRole.getRoomRole().equals(RoomRoles.ROOM_OWNER) |
+                userRoomRole.getRoomRole().equals(RoomRoles.ROOM_ADMINISTRATOR)) {
+            roomRepository.delete(room);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public boolean rename(long id, String newTitle, long userId) {
         Room room = findById(id);
+
+        User user = userService.findUser(userId);
+
+        UserRoomRole userRoomRole = getUserRoomRole(user, room);
+
+        if (userRoomRole.getRoomRole().equals(RoomRoles.ROOM_ADMINISTRATOR) |
+                userRoomRole.getRoomRole().equals(RoomRoles.ROOM_OWNER)) {
+            room.setTitle(newTitle);
+            roomRepository.save(room);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean rename(long userId, String roomTitle, String newTitle) {
+        Room room = findByTitle(roomTitle);
 
         User user = userService.findUser(userId);
 
@@ -115,6 +152,73 @@ public class RoomServiceImpl implements RoomService {
 
         if (userRoomRole != null) {
             Date banTime = userRoomRole.getAvailableLoginTime();
+            Date now = new Date();
+            if (now.compareTo(banTime) < 0) {
+                return false;
+            }
+        }
+
+        room.getUserRoomRoles()
+                .add(UserRoomRole.builder()
+                        .room(room)
+                        .user(userToConnect)
+                        .roomRole(RoomRoles.ROOM_USER)
+                        .availableLoginTime(new Date())
+                        .build());
+
+
+        roomRepository.save(room);
+        return true;
+    }
+
+    @Override
+    public boolean connect(long userIdToConnect, String roomTitle) {
+        User userToConnect = userService.findUser(userIdToConnect);
+
+        Room room = findByTitle(roomTitle);
+
+//        UserRoomRole userRoomRole = getUserRoomRole(userToConnect, room);
+
+        UserRoomRole userRoomRole = userToConnect.getUserRoomRoles()
+                .stream()
+                .filter((role -> role.getRoom().equals(room)))
+                .findAny()
+                .orElse(null);
+
+        if (userRoomRole != null) {
+            Date banTime = userRoomRole.getAvailableLoginTime();
+            Date now = new Date();
+            if (now.compareTo(banTime) < 0) {
+                return false;
+            }
+        }
+
+        room.getUserRoomRoles()
+                .add(UserRoomRole.builder()
+                        .room(room)
+                        .user(userToConnect)
+                        .roomRole(RoomRoles.ROOM_USER)
+                        .availableLoginTime(new Date())
+                        .build());
+
+        roomRepository.save(room);
+        return true;
+    }
+
+    @Override
+    public boolean connect(String userName, String roomTitle) {
+        User userToConnect = userService.findUser(userName);
+
+        Room room = findByTitle(roomTitle);
+
+        UserRoomRole userToConnectRoomRole = userToConnect.getUserRoomRoles()
+                .stream()
+                .filter((role -> role.getRoom().equals(room)))
+                .findAny()
+                .orElse(null);
+
+        if (userToConnectRoomRole != null) {
+            Date banTime = userToConnectRoomRole.getAvailableLoginTime();
             Date now = new Date();
             if (now.compareTo(banTime) < 0) {
                 return false;
@@ -159,45 +263,50 @@ public class RoomServiceImpl implements RoomService {
         user.getUserRoomRoles().remove(userRoomRole);
 
         userRepository.save(user);
-//        userService.update(user);
 
         return true;
     }
 
     @Override
-    public boolean disconnect(String roomTitle, long userIdToDisconnect,
+    public boolean disconnect(String roomTitle, String userNameToDisconnect,
                               long banTime, long userId) {
         Room room = findByTitle(roomTitle);
 
-        User userToDisconnect = userService.findUser(userIdToDisconnect);
+        User userToDisconnect = userService.findUser(userNameToDisconnect);
 
         User user = userService.findUser(userId);
 
         UserRoomRole userRoomRole = getUserRoomRole(user, room);
-        if (!userRoomRole.getRoomRole().equals(RoomRoles.ROOM_OWNER) |
-                !userRoomRole.getRoomRole().equals(RoomRoles.ROOM_ADMINISTRATOR) |
-                !userRoomRole.getRoomRole().equals(RoomRoles.ROOM_MODERATOR)) return false;
 
-        room.getUserRoomRoles()
-                .remove(UserRoomRole.builder()
-                        .room(room)
-                        .user(userToDisconnect)
-                        .build());
+        if ((userRoomRole.getRoomRole().equals(RoomRoles.ROOM_USER)) |
+                (userRoomRole.getRoomRole().equals(RoomRoles.ROOM_MODERATOR))
+        ) return false;
 
         if (banTime != 0) {
-            Date ban = DateUtils.addSeconds(new Date(), (int) banTime);
-            userToDisconnect.getUserRoomRoles().add(
-                    UserRoomRole.builder()
+            Date ban = DateUtils.addSeconds(new Date(), (int) banTime * 60);
+            UserRoomRole roleUserToBan = room.getUserRoomRoles().stream()
+                    .filter(u -> u.getUser().equals(userToDisconnect))
+                    .findAny()
+                    .orElseThrow(() -> new UserNotFoundException(userNameToDisconnect));
+            roleUserToBan.setRoomRole(RoomRoles.ROOM_BLOCKED_USER);
+            roleUserToBan.setAvailableLoginTime(ban);
+            room.getUserRoomRoles().add(roleUserToBan);
+            roomRepository.save(room);
+        } else {
+            room.getUserRoomRoles()
+                    .remove(UserRoomRole.builder()
                             .room(room)
                             .user(userToDisconnect)
-                            .roomRole(RoomRoles.ROOM_USER)
-                            .availableLoginTime(ban)
-                            .build()
-            );
+                            .build());
+            roomRepository.save(room);
+            //TODO
+            userToDisconnect.getUserRoomRoles()
+                    .remove(UserRoomRole.builder()
+                            .room(room)
+                            .user(userToDisconnect)
+                            .build());
             userRepository.save(userToDisconnect);
-//            userService.update(userToDisconnect);
         }
-        roomRepository.save(room);
         return true;
     }
 
@@ -209,14 +318,9 @@ public class RoomServiceImpl implements RoomService {
     }
 
     private UserRoomRole getUserRoomRole(User user, Room room) {
-        UserRoomRole userRoomRole = user.getUserRoomRoles()
+        return user.getUserRoomRoles()
                 .stream().filter(role -> role.getRoom().equals(room))
                 .findAny().orElse(null);
-        if (userRoomRole == null) {
-            throw new UserRoomRoleNotFoundException(user.getId(), room.getId());
-        } else {
-            return userRoomRole;
-        }
     }
 
     private Room findById(long id) {

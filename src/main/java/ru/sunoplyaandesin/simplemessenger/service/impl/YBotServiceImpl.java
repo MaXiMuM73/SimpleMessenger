@@ -6,20 +6,29 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.dto.MessageDTO;
 import ru.sunoplyaandesin.simplemessenger.dto.RoomDTO;
 import ru.sunoplyaandesin.simplemessenger.dto.UserDTO;
 import ru.sunoplyaandesin.simplemessenger.exception.YoutubeNotFoundException;
+import ru.sunoplyaandesin.simplemessenger.service.RoomService;
+import ru.sunoplyaandesin.simplemessenger.service.UserService;
 import ru.sunoplyaandesin.simplemessenger.service.YBotService;
 import ru.sunoplyaandesin.simplemessenger.service.command.Command;
 import ru.sunoplyaandesin.simplemessenger.service.command.CommandContainer;
+import ru.sunoplyaandesin.simplemessenger.service.command.CommandName;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class YBotServiceImpl implements YBotService {
+
+    private final RoomService roomService;
+
+    private final UserService userService;
 
     private final SimpMessagingTemplate template;
 
@@ -42,7 +51,7 @@ public class YBotServiceImpl implements YBotService {
     private String COMMAND_PREFIX;
 
     @Override
-    public MessageDTO channelInfo(String title) {
+    public List<MessageDTO> channelInfo(String title) {
         sendMessageToTopic(MessageDTO.builder()
                 .user(yBot)
                 .text("Channel title: " + title)
@@ -60,8 +69,7 @@ public class YBotServiceImpl implements YBotService {
                 .build();
 
         sendMessageToTopic(lastFiveVideoLinks);
-
-        return lastFiveVideoLinks;
+        return Collections.singletonList(lastFiveVideoLinks);
     }
 
     @Override
@@ -99,16 +107,21 @@ public class YBotServiceImpl implements YBotService {
     }
 
     @Override
-    public void help(String helpMessage) {
-        sendMessageToTopic(MessageDTO.builder()
+    public List<MessageDTO> help(String helpMessage) {
+        MessageDTO help = MessageDTO.builder()
                 .user(yBot)
+                .room(yBotRoom)
                 .text(helpMessage)
                 .createdDate(new Date())
-                .build());
+                .build();
+
+        sendMessageToTopic(help);
+
+        return Collections.singletonList(help);
     }
 
     @Override
-    public void sendMessage(String text) {
+    public String sendMessage(String text) {
         MessageDTO receivedMessage = MessageDTO.builder()
                 .room(yBotRoom)
                 .user(admin)
@@ -119,11 +132,33 @@ public class YBotServiceImpl implements YBotService {
         sendMessageToTopic(receivedMessage);
 
         if (text.startsWith(COMMAND_PREFIX)) {
-            String commandIdentifier = text.trim().split(" ")[0].toLowerCase();
+            List<String> commands = Arrays.stream(CommandName.values())
+                    .map(CommandName::getCommandName)
+                    .collect(Collectors.toList());
+
+            String commandIdentifier = commands.stream()
+                    .filter(text::contains).findAny()
+                    .orElseGet(() -> text).toLowerCase();
+
             Command command = commandContainer.retrieveCommand(commandIdentifier);
-            command.execute(text
-                    .replace(commandIdentifier, "").trim());
+            command.execute(text.replace(commandIdentifier, "").trim(), 1L);
         }
+        return text;
+    }
+
+    @Override
+    public List<MessageDTO> processCommand(String commandText, long userId) {
+        List<String> commands = Arrays.stream(CommandName.values())
+                .map(CommandName::getCommandName)
+                .collect(Collectors.toList());
+
+        String commandIdentifier = commands.stream()
+                .filter(commandText::contains).findAny()
+                .orElseGet(() -> commandText).toLowerCase();
+
+        Command command = commandContainer.retrieveCommand(commandIdentifier);
+
+        return command.execute(commandText.replace(commandIdentifier, "").trim(), userId);
     }
 
     private void sendMessageToTopic(MessageDTO messageDTO) {
@@ -248,5 +283,129 @@ public class YBotServiceImpl implements YBotService {
         } catch (IOException ioException) {
             throw new YoutubeNotFoundException(video.getSnippet().getTitle());
         }
+    }
+
+    @Override
+    public List<MessageDTO> createRoom(long userId, String roomTitle, boolean privateRoom) {
+        RoomDTO roomDTO = RoomDTO.builder()
+                .title(roomTitle)
+                .privateRoom(privateRoom)
+                .createdDate(new Date())
+                .build();
+
+        roomService.create(roomDTO, 1);
+        sendMessage("Room created: " + roomDTO.getTitle());
+        MessageDTO createRoomMessage = MessageDTO.builder()
+                .text("Room created: " + roomDTO.getTitle())
+                .user(yBot)
+                .room(yBotRoom)
+                .createdDate(new Date())
+                .build();
+        return Collections.singletonList(createRoomMessage);
+    }
+
+    @Override
+    public List<MessageDTO> deleteRoom(long userId, String roomTitle) {
+        roomService.delete(roomTitle, userId);
+        MessageDTO deleteRoomMessage = MessageDTO.builder()
+                .text("Room deleted: " + roomTitle)
+                .user(yBot)
+                .room(yBotRoom)
+                .createdDate(new Date())
+                .build();
+        return Collections.singletonList(deleteRoomMessage);
+    }
+
+    @Override
+    public List<MessageDTO> renameRoom(long userId, String roomTitle, String newTitle) {
+        roomService.rename(userId, roomTitle, newTitle);
+        MessageDTO renameRoomMessage = MessageDTO.builder()
+                .text("Room renamed: " + roomTitle + ". New title: " + newTitle)
+                .user(yBot)
+                .room(yBotRoom)
+                .createdDate(new Date())
+                .build();
+        return Collections.singletonList(renameRoomMessage);
+    }
+
+    @Override
+    public List<MessageDTO> unknownCommand() {
+        MessageDTO unknownCommandMessage = MessageDTO.builder()
+                .text("Unknown command. //help for command information.")
+                .user(yBot)
+                .room(yBotRoom)
+                .createdDate(new Date())
+                .build();
+        return Collections.singletonList(unknownCommandMessage);
+    }
+
+    @Override
+    public List<MessageDTO> connectToRoom(long userId, String roomTitle, String userNameToConnect) {
+        sendMessage("User connected.");
+        String text;
+        if (userNameToConnect.equals("")) {
+            roomService.connect(userId, roomTitle);
+            text = "User with id " + userId;
+        } else {
+            roomService.connect(userNameToConnect, roomTitle);
+            text = "User with name " + userNameToConnect;
+        }
+
+        MessageDTO connectToRoomMessage = MessageDTO.builder()
+                .text(text + " connected to Room: " + roomTitle)
+                .user(yBot)
+                .room(yBotRoom)
+                .createdDate(new Date())
+                .build();
+        return Collections.singletonList(connectToRoomMessage);
+    }
+
+    @Override
+    public List<MessageDTO> disconnectFromRoom(long userId, String roomTitle, String userNameToDisconnect, long banTime) {
+        String text = "User: " + userNameToDisconnect;
+        if (banTime != 0) {
+            text += " banned for " + banTime + " minutes.";
+        } else {
+            text += " disconnected from room: " + roomTitle;
+        }
+        roomService.disconnect(roomTitle, userNameToDisconnect, banTime, userId);
+        MessageDTO disconnectFromRoomMessage = MessageDTO.builder()
+                .text(text)
+                .user(yBot)
+                .room(yBotRoom)
+                .createdDate(new Date())
+                .build();
+        return Collections.singletonList(disconnectFromRoomMessage);
+    }
+
+    @Override
+    public List<MessageDTO> renameUser(long userId, String userToRename, String newName) {
+        String text = "User: " + userToRename + " renamed. New name: " + newName;
+        userService.rename(userId, userToRename, newName);
+        MessageDTO renameMessage = MessageDTO.builder()
+                .text(text)
+                .user(yBot)
+                .room(yBotRoom)
+                .createdDate(new Date())
+                .build();
+        return Collections.singletonList(renameMessage);
+    }
+
+    @Override
+    public List<MessageDTO> assignRoleToUser(long userId, String userToAssign, String tag) {
+        String text = "User: " + userToAssign;
+        if (tag.equals("-n")) {
+            text += " moderator.";
+        } else {
+            text += " user.";
+        }
+        userService.assignRoleToUser(userId, "testroom", userToAssign, tag);
+        MessageDTO assignMessage = MessageDTO.builder()
+                .text(text)
+                .user(yBot)
+                .room(yBotRoom)
+                .createdDate(new Date())
+                .build();
+        return Collections.singletonList(assignMessage);
     }
 }

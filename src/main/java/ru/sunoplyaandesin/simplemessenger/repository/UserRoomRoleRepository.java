@@ -7,5 +7,8 @@ import ru.sunoplyaandesin.simplemessenger.domain.roles.RoomRoles;
 
 public interface UserRoomRoleRepository extends CrudRepository<UserRoomRole, Long> {
 
-    UserRoomRole findUserRoomRoleByRoomRoleAndRoom(RoomRoles roomRole, Room room);
+//    UserRoomRole findUserRoomRoleByRoomRoleAndRoom(RoomRoles roomRole, Room room);
+
+    UserRoomRole findUserRoomRoleByUserIdAndRoomId(long userId, long roomId);
+
 }

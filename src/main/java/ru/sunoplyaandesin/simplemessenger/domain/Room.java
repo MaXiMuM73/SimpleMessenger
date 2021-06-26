@@ -1,6 +1,11 @@
 package ru.sunoplyaandesin.simplemessenger.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.util.*;
@@ -10,6 +15,9 @@ import java.util.*;
  */
 @Entity
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "rooms")
 public class Room {
 
@@ -43,21 +51,21 @@ public class Room {
     /**
      * Room owner
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     /**
      * Users in room
      */
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserRoomRole> userRoomRoles = new HashSet<>();
 
     /**
      * Messages in room
      */
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Message> messages;
+    private List<Message> messages = new ArrayList<>();
 
     @Override
     public String toString() {
@@ -77,13 +85,15 @@ public class Room {
         Room room = (Room) o;
 
         if (id != room.id) return false;
-        return title.equals(room.title);
+        if (!title.equals(room.title)) return false;
+        return user.equals(room.user);
     }
 
     @Override
     public int hashCode() {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + title.hashCode();
+        result = 31 * result + user.hashCode();
         return result;
     }
 }

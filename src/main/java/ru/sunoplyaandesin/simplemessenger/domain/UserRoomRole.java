@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import ru.sunoplyaandesin.simplemessenger.domain.roles.RoomRoles;
 
 import javax.persistence.*;
@@ -60,10 +63,10 @@ public class UserRoomRole {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        UserRoomRole userRoomRole = (UserRoomRole) o;
+        UserRoomRole that = (UserRoomRole) o;
 
-        if (!user.equals(userRoomRole.user)) return false;
-        return room.equals(userRoomRole.room);
+        if (!user.equals(that.user)) return false;
+        return room.equals(that.room);
     }
 
     @Override
@@ -71,5 +74,16 @@ public class UserRoomRole {
         int result = user.hashCode();
         result = 31 * result + room.hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "UserRoomRole{" +
+                "id=" + id +
+                ", user=" + user +
+                ", room=" + room +
+                ", roomRole=" + roomRole +
+                ", availableLoginTime=" + availableLoginTime +
+                '}';
     }
 }

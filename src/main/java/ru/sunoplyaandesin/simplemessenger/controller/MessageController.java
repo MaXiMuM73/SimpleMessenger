@@ -78,4 +78,14 @@ public interface MessageController {
     @DeleteMapping("{roomId}")
     ResponseEntity<String> deleteAll(
             @PathVariable(name = "roomId") long roomId);
+
+    @Operation(
+            summary = "Websocket messaging.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request")
+            },
+            description = "Allows you to send message via Websocket."
+    )
+    ResponseEntity<String> sendMessage(MessageDTO messageDTO);
 }

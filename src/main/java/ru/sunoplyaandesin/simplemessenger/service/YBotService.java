@@ -6,11 +6,29 @@ import java.util.List;
 
 public interface YBotService {
 
-    MessageDTO channelInfo(String title);
+    List<MessageDTO> channelInfo(String title);
 
     List<MessageDTO> videoCommentRandom(String channelTitle, String videoTitle);
 
-    void help(String helpMessage);
+    List<MessageDTO> help(String helpMessage);
 
-    void sendMessage(String command);
+    String sendMessage(String command);
+
+    List<MessageDTO> processCommand(String commandText, long userId);
+
+    List<MessageDTO> createRoom(long userId, String roomTitle, boolean privateRoom);
+
+    List<MessageDTO> deleteRoom(long userId, String roomTitle);
+
+    List<MessageDTO> renameRoom(long userId, String roomTitle, String newTitle);
+
+    List<MessageDTO> connectToRoom(long userId, String roomTitle, String userNameToConnect);
+
+    List<MessageDTO> unknownCommand();
+
+    List<MessageDTO> disconnectFromRoom(long userId, String roomTitle, String userNameToDisconnect, long banTime);
+
+    List<MessageDTO> renameUser(long userId, String userToRename, String newName);
+
+    List<MessageDTO> assignRoleToUser(long userId, String userToAssign, String tag);
 }

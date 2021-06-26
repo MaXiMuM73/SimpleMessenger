@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.dto.MessageDTO;
 
 import java.io.IOException;
@@ -23,7 +25,7 @@ public interface YBotController {
             description = "Allows you to get channel info"
     )
     @GetMapping("/channelInfo")
-    ResponseEntity<MessageDTO> channelInfo(@RequestParam(value = "channelTitle") String title) throws IOException;
+    ResponseEntity<List<MessageDTO>> channelInfo(@RequestParam(value = "channelTitle") String title) throws IOException;
 
     @Operation(
             summary = "Random comment of video",
@@ -37,6 +39,7 @@ public interface YBotController {
     ResponseEntity<List<MessageDTO>> videoRandomComment(@RequestParam(value = "channelTitle") String channelTitle,
                                                         @RequestParam(value = "videoTitle") String videoTitle) throws IOException;
 
-    @GetMapping("{command}")
-    ResponseEntity<String> command(@PathVariable(name = "command") String command);
+    @GetMapping()
+    ResponseEntity<List<MessageDTO>> command(@RequestBody String command,
+                                             @AuthenticationPrincipal User user);
 }

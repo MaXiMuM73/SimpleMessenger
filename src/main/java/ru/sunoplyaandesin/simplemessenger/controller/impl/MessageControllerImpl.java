@@ -2,11 +2,14 @@ package ru.sunoplyaandesin.simplemessenger.controller.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 import ru.sunoplyaandesin.simplemessenger.controller.MessageController;
 import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.dto.MessageDTO;
 import ru.sunoplyaandesin.simplemessenger.service.MessageService;
+import ru.sunoplyaandesin.simplemessenger.service.YBotService;
 
 import java.util.List;
 
@@ -16,6 +19,8 @@ import java.util.List;
 public class MessageControllerImpl implements MessageController {
 
     private final MessageService messageService;
+
+    private final YBotService yBotService;
 
     @Override
     public ResponseEntity<MessageDTO> create(String text, long roomId, User user) {
@@ -43,5 +48,12 @@ public class MessageControllerImpl implements MessageController {
     public ResponseEntity<String> deleteAll(long roomId) {
         messageService.deleteAll(roomId);
         return ResponseEntity.ok("All messages in room with id " + roomId + " deleted.");
+    }
+
+    @Override
+    @MessageMapping("/hello")
+    @SendTo("/topic/greetings")
+    public ResponseEntity<String> sendMessage(MessageDTO messageDTO) {
+        return ResponseEntity.ok(yBotService.sendMessage(messageDTO.getText()));
     }
 }

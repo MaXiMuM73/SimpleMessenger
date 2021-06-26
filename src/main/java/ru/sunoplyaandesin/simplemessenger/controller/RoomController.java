@@ -125,7 +125,7 @@ public interface RoomController {
     ResponseEntity<String> disconnect(
             @PathVariable(name = "roomTitle") String roomTitle,
             @RequestParam(value = "userId")
-            @Parameter(description = "user id", required = true) long userIdToDisconnect,
+            @Parameter(description = "user id", required = true) String userNameToDisconnect,
             @RequestParam(value = "banTime")
             @Parameter(description = "ban param", required = false) long banTime,
             @AuthenticationPrincipal User user);

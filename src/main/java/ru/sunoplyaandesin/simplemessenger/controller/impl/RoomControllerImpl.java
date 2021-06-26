@@ -70,10 +70,10 @@ public class RoomControllerImpl implements RoomController {
     }
 
     @Override
-    public ResponseEntity<String> disconnect(String roomTitle, long userIdToDisconnect,
+    public ResponseEntity<String> disconnect(String roomTitle, String userNameToDisconnect,
                                              long banTime, User user) {
-        roomService.disconnect(roomTitle, userIdToDisconnect, banTime, user.getId());
-        return ResponseEntity.ok("User with id " + userIdToDisconnect
+        roomService.disconnect(roomTitle, userNameToDisconnect, banTime, user.getId());
+        return ResponseEntity.ok("User : " + userNameToDisconnect
                 + " disconnected from room with title " + roomTitle);
     }
 }

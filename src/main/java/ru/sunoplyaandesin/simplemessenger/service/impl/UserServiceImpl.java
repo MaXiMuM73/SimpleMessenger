@@ -21,7 +21,6 @@ import ru.sunoplyaandesin.simplemessenger.service.mapper.UserMapper;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -63,6 +62,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User findUser(String name) {
+        return findByName(name);
+    }
+
+    @Override
     public UserDTO update(UserDTO userDTO) {
         User updateUser = findByName(userDTO.getName());
         updateUser.setName(userDTO.getName());
@@ -70,6 +74,18 @@ public class UserServiceImpl implements UserService {
         updateUser.setSystemRole(userDTO.getSystemRole());
         userRepository.save(updateUser);
         return userMapper.toDto(updateUser);
+    }
+
+    @Override
+    public boolean rename(long userId, String userToRename, String newUserName) {
+        User user = findUser(userId);
+
+        if (!user.getSystemRole().equals(SystemRoles.SYSTEM_ADMIN)) return false;
+
+        User renameUser = findByName(userToRename);
+        renameUser.setName(newUserName);
+        userRepository.save(renameUser);
+        return true;
     }
 
     @Override
@@ -103,8 +119,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void setRoomRole(String userName, String roomRole, long roomId, long id) {
-        User user = findById(id);
+    public void setRoomRole(String userName, String roomRole, long roomId, long userId) {
+        User user = findById(userId);
 
         Room room = roomRepository.findById(roomId).get();
 
@@ -133,5 +149,30 @@ public class UserServiceImpl implements UserService {
     private User findByName(String name) {
         return userRepository.findByName(name)
                 .orElseThrow(() -> new UserNotFoundException(name));
+    }
+
+    @Override
+    public boolean assignRoleToUser(long userId, String roomTitle, String userToAssign, String tag) {
+        User user = findUser(userId);
+
+        if (!user.getSystemRole().equals(SystemRoles.SYSTEM_ADMIN)) return false;
+
+        User assignUser = findByName(userToAssign);
+
+        UserRoomRole userRoomRole = assignUser.getUserRoomRoles().stream()
+                .filter((role) -> role.getRoom().getTitle().equals(roomTitle))
+                .findAny()
+                .orElseThrow(() -> new UserNotFoundException(userToAssign));
+
+        if (tag.equals("-n")) {
+            userRoomRole.setRoomRole(RoomRoles.ROOM_MODERATOR);
+        } else {
+            userRoomRole.setRoomRole(RoomRoles.ROOM_USER);
+        }
+
+        assignUser.getUserRoomRoles().add(userRoomRole);
+
+        userRepository.save(assignUser);
+        return true;
     }
 }
