@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import ru.sunoplyaandesin.simplemessenger.service.YBotService;
 import ru.sunoplyaandesin.simplemessenger.service.command.impl.*;
 import ru.sunoplyaandesin.simplemessenger.service.command.impl.room.*;
+import ru.sunoplyaandesin.simplemessenger.service.command.impl.user.UserBanCommand;
 import ru.sunoplyaandesin.simplemessenger.service.command.impl.user.UserModeratorCommand;
 import ru.sunoplyaandesin.simplemessenger.service.command.impl.user.UserRenameCommand;
 import ru.sunoplyaandesin.simplemessenger.service.command.impl.youtube.ChannelInfoCommand;
@@ -32,6 +33,7 @@ public class CommandContainer {
                 .put(ROOM_DISCONNECT.getCommandName(), new RoomDisconnectCommand(yBotService))
                 .put(USER_RENAME.getCommandName(), new UserRenameCommand(yBotService))
                 .put(USER_MODERATOR.getCommandName(), new UserModeratorCommand(yBotService))
+                .put(USER_BAN.getCommandName(), new UserBanCommand(yBotService))
                 .build();
 
         this.unknownCommand = new UnknownCommand(yBotService);

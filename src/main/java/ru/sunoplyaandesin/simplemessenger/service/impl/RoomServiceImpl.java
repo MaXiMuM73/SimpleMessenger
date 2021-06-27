@@ -35,7 +35,6 @@ public class RoomServiceImpl implements RoomService {
 
     private final UserRoomRoleRepository userRoomRoleRepository;
 
-    //TODO unique room title
     @Override
     public RoomDTO create(RoomDTO roomDTO, long userId) {
         User user = userService.findUser(userId);

@@ -12,7 +12,8 @@ public enum CommandName {
     ROOM_CONNECT("//room connect"),
     ROOM_DISCONNECT("//room disconnect"),
     USER_RENAME("//user rename"),
-    USER_MODERATOR("//user moderator");
+    USER_MODERATOR("//user moderator"),
+    USER_BAN("//user ban");
 
     public final String commandName;
 

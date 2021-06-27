@@ -106,7 +106,6 @@ public interface RoomService {
      * @param roomId of {@link Room room}
      * @param userId
      */
-    //TODO: may be userId dont need this
     void connectAll(long roomId, long userId);
 
     /**

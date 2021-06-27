@@ -63,6 +63,7 @@ public interface UserService {
 
     /**
      * Returns list of all users {@link UserDTO userDTO}
+     *
      * @return list of {@link UserDTO userDTO}
      */
     List<UserDTO> findAll();
@@ -85,5 +86,24 @@ public interface UserService {
      */
     void setRoomRole(String userName, String roomRole, long roomId, long userId);
 
+    /**
+     * Assigns user
+     *
+     * @param userId       of {@link User user}
+     * @param roomTitle    of {@link Room room}
+     * @param userToAssign of {@link User user}
+     * @param tag
+     * @return true if the assign is successful or false
+     */
     boolean assignRoleToUser(long userId, String roomTitle, String userToAssign, String tag);
+
+    /**
+     * Bans user
+     *
+     * @param userId    of {@link User user}
+     * @param userToBan of {@link User user}
+     * @param banTime
+     * @return true if the ban is successful or false
+     */
+    boolean banUser(long userId, String userToBan, long banTime);
 }

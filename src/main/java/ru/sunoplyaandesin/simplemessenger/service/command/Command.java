@@ -16,7 +16,8 @@ public interface Command {
                     "//room connect {room title} -l {user name} " +
                     "//room disconnect {room title} " +
                     "//user rename {user name}||{new user name} " +
-                    "//user moderator {user name} -n (moderator) -d (user) ";
+                    "//user moderator {user name} -n (moderator) -d (user) " +
+                    "//user ban -l {user name} -m {ban time} ";
 
     List<MessageDTO> execute(String command, long userId);
 }

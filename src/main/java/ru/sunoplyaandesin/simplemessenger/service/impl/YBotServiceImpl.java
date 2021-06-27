@@ -393,7 +393,8 @@ public class YBotServiceImpl implements YBotService {
     }
 
     @Override
-    public List<MessageDTO> disconnectFromRoom(long userId, String roomTitle, String userNameToDisconnect, long banTime) {
+    public List<MessageDTO> disconnectFromRoom(long userId, String roomTitle,
+                                               String userNameToDisconnect, long banTime) {
         String text = "User: " + userNameToDisconnect;
         if (banTime != 0) {
             text += " banned for " + banTime + " minutes.";
@@ -439,5 +440,23 @@ public class YBotServiceImpl implements YBotService {
                 .createdDate(new Date())
                 .build();
         return Collections.singletonList(assignMessage);
+    }
+
+    @Override
+    public List<MessageDTO> banUser(long userId, String userToBan, long banTime) {
+        String text = "User: " + userToBan;
+        if (banTime != 0) {
+            text += " banned for " + banTime + " minutes.";
+        } else {
+            text += " disconnected from all rooms.";
+        }
+        userService.banUser(userId, userToBan, banTime);
+        MessageDTO banMessage = MessageDTO.builder()
+                .text(text)
+                .user(yBot)
+                .room(yBotRoom)
+                .createdDate(new Date())
+                .build();
+        return Collections.singletonList(banMessage);
     }
 }

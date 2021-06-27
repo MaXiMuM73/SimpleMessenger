@@ -1,6 +1,7 @@
 package ru.sunoplyaandesin.simplemessenger.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import ru.sunoplyaandesin.simplemessenger.repository.UserRepository;
 import ru.sunoplyaandesin.simplemessenger.service.UserService;
 import ru.sunoplyaandesin.simplemessenger.service.mapper.UserMapper;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -173,6 +175,27 @@ public class UserServiceImpl implements UserService {
         assignUser.getUserRoomRoles().add(userRoomRole);
 
         userRepository.save(assignUser);
+        return true;
+    }
+
+    @Override
+    public boolean banUser(long userId, String userToBan, long banTime) {
+        User user = findUser(userId);
+        if (!user.getSystemRole().equals(SystemRoles.SYSTEM_ADMIN)) return false;
+
+        User banUser = findUser(userToBan);
+
+        if (banTime != 0) {
+            Date ban = DateUtils.addSeconds(new Date(), (int) banTime * 60);
+            banUser.getUserRoomRoles().stream().peek((role) -> {
+                role.setRoomRole(RoomRoles.ROOM_BLOCKED_USER);
+                role.setAvailableLoginTime(ban);
+            }).collect(Collectors.toList());
+        } else {
+            banUser.getUserRoomRoles().clear();
+        }
+
+        userRepository.save(banUser);
         return true;
     }
 }
