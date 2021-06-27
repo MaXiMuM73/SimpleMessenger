@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.dto.MessageDTO;
 import ru.sunoplyaandesin.simplemessenger.dto.RoomDTO;
 import ru.sunoplyaandesin.simplemessenger.dto.UserDTO;
@@ -19,6 +18,7 @@ import ru.sunoplyaandesin.simplemessenger.service.command.CommandContainer;
 import ru.sunoplyaandesin.simplemessenger.service.command.CommandName;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -74,16 +74,17 @@ public class YBotServiceImpl implements YBotService {
 
     @Override
     public List<MessageDTO> videoCommentRandom(String channelTitle, String videoTitle) {
-        sendMessageToTopic(MessageDTO.builder()
-                .user(yBot)
-                .text("Channel title: " + channelTitle)
-                .createdDate(new Date())
-                .build());
-        sendMessageToTopic(MessageDTO.builder()
-                .user(yBot)
-                .text("Video title: " + videoTitle)
-                .createdDate(new Date())
-                .build());
+//        sendMessageToTopic(MessageDTO.builder()
+//                .user(yBot)
+//                .text("Channel title: " + channelTitle)
+//                .createdDate(new Date())
+//                .build());
+//        sendMessageToTopic(MessageDTO.builder()
+//                .user(yBot)
+//                .text("Video title: " + videoTitle)
+//                .createdDate(new Date())
+//                .build());
+
 
         String channelId = getChannelId(channelTitle);
         Channel channel = getChannelByChannelId(channelId);
@@ -102,6 +103,37 @@ public class YBotServiceImpl implements YBotService {
                     .createdDate(new Date())
                     .build());
             return randomComment;
+        }
+        throw new YoutubeNotFoundException(videoTitle);
+    }
+
+    @Override
+    public List<MessageDTO> getVideoLinkLikeView(String channelTitle, String videoTitle) {
+        String channelId = getChannelId(channelTitle);
+        Channel channel = getChannelByChannelId(channelId);
+        PlaylistItem videoByTitle = findVideoByTitle(channel, videoTitle);
+        if (videoByTitle != null) {
+            String videoId = videoByTitle.getContentDetails().getVideoId();
+            String videoLink = VIDEO_URL_START + videoId;
+            String text = videoLink;
+            try {
+                YouTube.Videos.List request = youtube.videos()
+                        .list("snippet,contentDetails,statistics")
+                        .setKey(API_KEY);
+                VideoListResponse response = request.setId(videoId).execute();
+                BigInteger likeCount = response.getItems().get(0).getStatistics().getLikeCount();
+                BigInteger viewCount = response.getItems().get(0).getStatistics().getViewCount();
+                text += " likes: " + likeCount + " views: " + viewCount;
+            } catch (IOException ioException) {
+                throw new YoutubeNotFoundException(videoId);
+            }
+            MessageDTO videoLinkLikesViewMessage = MessageDTO.builder()
+                    .text(text)
+                    .user(yBot)
+                    .room(yBotRoom)
+                    .createdDate(new Date())
+                    .build();
+            return Collections.singletonList(videoLinkLikesViewMessage);
         }
         throw new YoutubeNotFoundException(videoTitle);
     }
@@ -237,7 +269,7 @@ public class YBotServiceImpl implements YBotService {
             playlistItemRequest.setPlaylistId(uploadPlaylistId);
             playlistItemRequest.setMaxResults(5L);
             playlistItemRequest.setFields(
-                    "items(contentDetails/videoId,snippet/title,snippet/publishedAt),nextPageToken,pageInfo");
+                    "items(contentDetails/videoId,snippet/title,snippet/publishedAt), nextPageToken, pageInfo");
             playlistItemRequest.setPageToken(token);
             return playlistItemRequest.execute();
         } catch (IOException ioException) {

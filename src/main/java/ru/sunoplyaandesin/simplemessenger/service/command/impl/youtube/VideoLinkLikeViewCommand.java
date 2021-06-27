@@ -6,13 +6,13 @@ import ru.sunoplyaandesin.simplemessenger.service.command.Command;
 
 import java.util.List;
 
-public class RandomCommentCommand implements Command {
+public class VideoLinkLikeViewCommand implements Command {
 
     private final YBotService yBotService;
 
-    public static final String RANDOM_COMMENT_MESSAGE = "Random comment command. Returns random video comment.";
+    public static final String VIDEO_LINK_LIKE_VIEW_MESSAGE = "Video link like view command. Returns video link, likes, views.";
 
-    public RandomCommentCommand(YBotService yBotService) {
+    public VideoLinkLikeViewCommand(YBotService yBotService) {
         this.yBotService = yBotService;
     }
 
@@ -26,6 +26,6 @@ public class RandomCommentCommand implements Command {
         String videoTitle = command
                 .substring(beginOfVideoTitle + 1);
 
-        return yBotService.videoCommentRandom(channelTitle, videoTitle);
+        return yBotService.getVideoLinkLikeView(channelTitle, videoTitle);
     }
 }

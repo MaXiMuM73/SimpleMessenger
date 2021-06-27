@@ -5,6 +5,7 @@ public enum CommandName {
     HELP("//help"),
     CHANNEL_INFO("//channelinfo"),
     RANDOM_COMMENT("//randomcomment"),
+    FIND("//find"),
     ROOM_CREATE("//room create"),
     ROOM_DELETE("//room delete"),
     ROOM_RENAME("//room rename"),

@@ -9,8 +9,9 @@ public interface Command {
             "//help - print all commands " +
                     "//channelinfo {channel title} - print last five video links " +
                     "//randomcomment {channel title}||{video title} - print random comment " +
+                    "//find {channel title}||{video title} " +
                     "//room create {room title} - create room for user " +
-                    "//room rename {room totle}||{new room title} " +
+                    "//room rename {room title}||{new room title} " +
                     "//room remove {room title} " +
                     "//room connect {room title} -l {user name} " +
                     "//room disconnect {room title} " +

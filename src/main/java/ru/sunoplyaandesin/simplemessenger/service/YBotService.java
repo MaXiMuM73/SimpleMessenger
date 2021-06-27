@@ -1,5 +1,6 @@
 package ru.sunoplyaandesin.simplemessenger.service;
 
+import com.google.api.services.youtube.model.PlaylistItem;
 import ru.sunoplyaandesin.simplemessenger.dto.MessageDTO;
 
 import java.util.List;
@@ -31,4 +32,6 @@ public interface YBotService {
     List<MessageDTO> renameUser(long userId, String userToRename, String newName);
 
     List<MessageDTO> assignRoleToUser(long userId, String userToAssign, String tag);
+
+    List<MessageDTO> getVideoLinkLikeView(String channelTitle, String videoTitle);
 }

@@ -8,7 +8,8 @@ import ru.sunoplyaandesin.simplemessenger.service.command.impl.user.UserModerato
 import ru.sunoplyaandesin.simplemessenger.service.command.impl.user.UserRenameCommand;
 import ru.sunoplyaandesin.simplemessenger.service.command.impl.youtube.ChannelInfoCommand;
 import ru.sunoplyaandesin.simplemessenger.service.command.impl.youtube.HelpCommand;
-//import ru.sunoplyaandesin.simplemessenger.service.command.impl.youtube.RandomCommentCommand;
+import ru.sunoplyaandesin.simplemessenger.service.command.impl.youtube.RandomCommentCommand;
+import ru.sunoplyaandesin.simplemessenger.service.command.impl.youtube.VideoLinkLikeViewCommand;
 
 import static ru.sunoplyaandesin.simplemessenger.service.command.CommandName.*;
 
@@ -22,7 +23,8 @@ public class CommandContainer {
         commandMap = ImmutableMap.<String, Command>builder()
                 .put(HELP.getCommandName(), new HelpCommand(yBotService))
                 .put(CHANNEL_INFO.getCommandName(), new ChannelInfoCommand(yBotService))
-//                .put(RANDOM_COMMENT.getCommandName(), new RandomCommentCommand(yBotService))
+                .put(RANDOM_COMMENT.getCommandName(), new RandomCommentCommand(yBotService))
+                .put(FIND.getCommandName(), new VideoLinkLikeViewCommand(yBotService))
                 .put(ROOM_CREATE.getCommandName(), new RoomCreateCommand(yBotService))
                 .put(ROOM_DELETE.getCommandName(), new RoomDeleteCommand(yBotService))
                 .put(ROOM_RENAME.getCommandName(), new RoomRenameCommand(yBotService))
