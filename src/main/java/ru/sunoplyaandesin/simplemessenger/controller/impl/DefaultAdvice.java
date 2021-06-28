@@ -16,7 +16,8 @@ public class DefaultAdvice {
     @ExceptionHandler({UserNotFoundException.class,
             RoomNotFoundException.class, MessageNotFoundException.class,
             WrongPasswordException.class, UserRoomRoleNotFoundException.class,
-            YoutubeNotFoundException.class, UnknownHostException.class})
+            YoutubeNotFoundException.class, UnknownHostException.class,
+            UserAlreadyExistException.class})
     public ResponseEntity<Response> handleException(Exception e) {
         Response response = new Response(e.getMessage());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
