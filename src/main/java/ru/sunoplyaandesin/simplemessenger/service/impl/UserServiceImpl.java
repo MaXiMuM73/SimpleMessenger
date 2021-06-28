@@ -12,6 +12,7 @@ import ru.sunoplyaandesin.simplemessenger.domain.UserRoomRole;
 import ru.sunoplyaandesin.simplemessenger.domain.roles.RoomRoles;
 import ru.sunoplyaandesin.simplemessenger.domain.roles.SystemRoles;
 import ru.sunoplyaandesin.simplemessenger.dto.UserDTO;
+import ru.sunoplyaandesin.simplemessenger.exception.UserAlreadyExistException;
 import ru.sunoplyaandesin.simplemessenger.exception.UserNotFoundException;
 import ru.sunoplyaandesin.simplemessenger.exception.WrongPasswordException;
 import ru.sunoplyaandesin.simplemessenger.repository.RoomRepository;
@@ -40,6 +41,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO create(UserDTO userDTO) {
         User user = userMapper.toUser(userDTO);
+        if (userRepository.findByName(user.getName()).isPresent())
+            throw new UserAlreadyExistException(user.getName());
         user.setSystemRole(SystemRoles.SYSTEM_USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
