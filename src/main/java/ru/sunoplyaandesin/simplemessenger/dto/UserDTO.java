@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import ru.sunoplyaandesin.simplemessenger.domain.roles.SystemRoles;
 
+import java.util.List;
+
 @Data
 public class UserDTO {
 
@@ -20,4 +22,6 @@ public class UserDTO {
 
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private SystemRoles systemRole;
+
+    private List<RoomDTO> rooms;
 }
