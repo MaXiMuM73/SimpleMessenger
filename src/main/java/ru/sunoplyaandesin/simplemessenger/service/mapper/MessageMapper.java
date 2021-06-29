@@ -1,6 +1,7 @@
 package ru.sunoplyaandesin.simplemessenger.service.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import ru.sunoplyaandesin.simplemessenger.domain.Message;
 import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.dto.MessageDTO;
@@ -13,7 +14,9 @@ public interface MessageMapper {
 
     Message toMessage(MessageDTO messageDTO);
 
+    @Mapping(target = "rooms", ignore = true)
     UserDTO userToUserDTO(User user);
 
+    @Mapping(target = "rooms", ignore = true)
     User userDTOtoUser(UserDTO userDTO);
 }
