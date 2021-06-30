@@ -11,6 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ru.sunoplyaandesin.simplemessenger.auth.JwtFilter;
+import ru.sunoplyaandesin.simplemessenger.auth.RestAccessDeniedHandler;
+import ru.sunoplyaandesin.simplemessenger.auth.RestAuthenticationEntryPoint;
 import ru.sunoplyaandesin.simplemessenger.domain.roles.SystemRoles;
 
 @Configuration
@@ -20,22 +22,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtFilter jwtFilter;
 
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+
+    private final RestAccessDeniedHandler restAccessDeniedHandler;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .httpBasic().disable()
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+        http.cors().and().csrf().disable()
+//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                .and()
                 .authorizeRequests()
-                .antMatchers("/").permitAll()
+                .antMatchers("/users/auth").permitAll()
                 .antMatchers(AUTH_WHITELIST).permitAll()
-                .antMatchers("/users/auth/").permitAll()
-                .antMatchers("/ybot").authenticated()
-//                .antMatchers("/users/create", "/users/auth").permitAll()
-//                .antMatchers("/users/delete").hasAuthority(SystemRoles.SYSTEM_ADMIN.name())
-//                .antMatchers("/**").authenticated()
+                .anyRequest().authenticated()
                 .and()
+                .exceptionHandling()
+                .accessDeniedHandler(restAccessDeniedHandler)
+                .authenticationEntryPoint(restAuthenticationEntryPoint).and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);;
+        http
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
