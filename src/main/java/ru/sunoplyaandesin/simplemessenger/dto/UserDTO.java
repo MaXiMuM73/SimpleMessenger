@@ -23,5 +23,7 @@ public class UserDTO {
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private SystemRoles systemRole;
 
+    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<RoomDTO> rooms;
 }

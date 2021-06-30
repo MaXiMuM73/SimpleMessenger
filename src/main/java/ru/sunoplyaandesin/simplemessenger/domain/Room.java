@@ -59,7 +59,7 @@ public class Room {
      * Users in room
      */
     @OneToMany(mappedBy = "room", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserRoomRole> userRoomRoles = new HashSet<>();
+    private List<UserRoomRole> userRoomRoles = new ArrayList<>();
 
     /**
      * Messages in room
