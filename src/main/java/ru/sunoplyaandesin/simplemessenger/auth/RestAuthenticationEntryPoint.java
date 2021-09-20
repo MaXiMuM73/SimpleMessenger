@@ -16,7 +16,8 @@ import java.io.OutputStream;
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest httpServletRequest,
-                         HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
+                         HttpServletResponse httpServletResponse,
+                         AuthenticationException e) throws IOException, ServletException {
         Response response = new Response("Unauthorised");
         OutputStream out = httpServletResponse.getOutputStream();
         ObjectMapper mapper = new ObjectMapper();

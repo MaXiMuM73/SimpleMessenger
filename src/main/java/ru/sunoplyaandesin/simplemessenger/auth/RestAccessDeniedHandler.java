@@ -15,7 +15,9 @@ import java.io.OutputStream;
 @Component
 public class RestAccessDeniedHandler implements AccessDeniedHandler {
     @Override
-    public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AccessDeniedException e) throws IOException, ServletException {
+    public void handle(HttpServletRequest httpServletRequest,
+                       HttpServletResponse httpServletResponse,
+                       AccessDeniedException e) throws IOException, ServletException {
         Response response = new Response("Access Denied");
         OutputStream out = httpServletResponse.getOutputStream();
         ObjectMapper mapper = new ObjectMapper();
