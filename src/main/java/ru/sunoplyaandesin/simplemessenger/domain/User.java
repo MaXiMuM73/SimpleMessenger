@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import ru.sunoplyaandesin.simplemessenger.domain.roles.SystemRoles;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.*;
 
 /**

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.dto.UserDTO;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Tag(name = "User controller", description = "User controller description")
@@ -25,8 +26,8 @@ public interface UserController {
             description = "Allows you to register a user"
     )
     @PostMapping("/create")
-    ResponseEntity<UserDTO> create(
-            @RequestBody @Parameter(description = "UserDTO", required = true) UserDTO userDTO);
+    ResponseEntity<String> create(
+            @Valid @RequestBody @Parameter(description = "UserDTO", required = true) UserDTO userDTO);
 
     @Operation(
             summary = "User finding",

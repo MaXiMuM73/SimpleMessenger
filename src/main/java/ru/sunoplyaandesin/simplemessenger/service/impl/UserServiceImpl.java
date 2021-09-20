@@ -39,14 +39,14 @@ public class UserServiceImpl implements UserService {
     private final JwtProvider jwtProvider;
 
     @Override
-    public UserDTO create(UserDTO userDTO) {
+    public String create(UserDTO userDTO) {
         User user = userMapper.toUser(userDTO);
         if (userRepository.findByName(user.getName()).isPresent())
             throw new UserAlreadyExistException(user.getName());
         user.setSystemRole(SystemRoles.SYSTEM_USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
-        return userMapper.toDto(user);
+        return userDTO.getName() + " created.";
     }
 
     @Override

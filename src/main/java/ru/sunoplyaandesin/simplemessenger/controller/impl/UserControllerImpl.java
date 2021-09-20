@@ -8,7 +8,11 @@ import ru.sunoplyaandesin.simplemessenger.domain.User;
 import ru.sunoplyaandesin.simplemessenger.dto.UserDTO;
 import ru.sunoplyaandesin.simplemessenger.service.UserService;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -19,7 +23,7 @@ public class UserControllerImpl implements UserController {
     private final UserService userService;
 
     @Override
-    public ResponseEntity<UserDTO> create(UserDTO userDTO) {
+    public ResponseEntity<String> create(UserDTO userDTO) {
         return ResponseEntity.ok(userService.create(userDTO));
     }
 

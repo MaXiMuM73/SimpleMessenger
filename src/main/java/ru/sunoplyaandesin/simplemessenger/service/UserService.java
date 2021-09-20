@@ -13,9 +13,9 @@ public interface UserService {
      * Creates new user {@link User user}
      *
      * @param userDTO of {@link UserDTO userDTO}
-     * @return {@link UserDTO userDTO}
+     * @return name of {@link UserDTO userDTO}
      */
-    UserDTO create(UserDTO userDTO);
+    String create(UserDTO userDTO);
 
     /**
      * Finds user by id {@link User user}
